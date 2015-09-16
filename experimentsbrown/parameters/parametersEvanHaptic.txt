@@ -1,0 +1,17 @@
+# Comments start with #
+# If subjectName is "junk" overwrites
+# Specify BaseDir with the backslash as follows
+BaseDir: dataset\junk\
+SubjectName: junk
+# number of repetitions
+Repetitions: 1
+RandomizeWithoutConsecutive: 0
+# randomize levels of factors (1) or not (0)
+Randomize: 1
+MaxReinsertions: 999
+
+#########################################
+# Here follows the list of all factors, they all start with "f"
+#########################################
+fobjDepth: -400
+fobjHeight: 30 40 50 60

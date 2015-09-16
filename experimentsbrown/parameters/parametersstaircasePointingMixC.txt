@@ -1,0 +1,35 @@
+# Comments start with #
+# If subjectName is "junk" overwrites
+# Specify BaseDir with the backslash as follows
+BaseDir: dataset\junk\
+SubjectName: junk
+ThetaSign: 1
+# number of repetitions
+Repetitions: 4
+RandomizeWithoutConsecutive: 0
+# randomize levels of factors (1) or not (0)
+Randomize: 1
+SquareSize: 30
+VirtualObjRelDepthUpBound: 15
+VirtualObjRelDepthLowBound: -25
+VirtualObjSizeUpBound: 15
+VirtualObjSizeLowBound: -15
+StartPosObj: -390
+#########################################
+# Here follows the list of all factors, they all start with "f"
+#########################################
+fAbsDepth: -400
+fRelDepthObj: 30 50
+fCondition: 0 1
+
+sStairNumber: 4
+sStairStartStates: 10.0,20.0,40.0,60.0
+sStairAscending: 1,1,0,0
+sStairCorrectAnswers: 3,2,2,3
+sStairMaxInversions: 6,6,6,6
+sStairMaxTrials: 30,30,30,30
+sStairPositiveStep: 10,5,3.5,2.5,1.0,0.5
+sStairNegativeStep: 2
+sStairClampLower: 0.0	
+sStairClampUpper: 100.0
+sStairMaxClampHits: 5

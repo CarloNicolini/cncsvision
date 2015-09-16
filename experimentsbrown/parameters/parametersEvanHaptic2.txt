@@ -1,0 +1,24 @@
+# Comments start with #
+# If subjectName is "junk" overwrites
+# Specify BaseDir with the backslash as follows
+BaseDir: dataset\junk\
+SubjectName: junk
+ThetaSign: 1
+# number of repetitions
+Repetitions: 30
+RandomizeWithoutConsecutive: 0
+# randomize levels of factors (1) or not (0)
+Randomize: 1
+TimeLimit: 1000
+StartPosObj: -390
+MaxReinsertions: 999
+#MaxPercentOccludedFrames: 50
+
+#########################################
+# Here follows the list of all factors, they all start with "f"
+# RodVisibleTimes are 5 and 1000
+#########################################
+fAbsDepth: -400
+fHapticFB: 2
+fStimPosn: 1 2
+fRodVisibleTime: 1000

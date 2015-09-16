@@ -1,0 +1,25 @@
+SubjectName: junk
+BaseDir: dataset\
+
+Repetitions: 5
+Randomize: 0
+IOD: 65
+
+AdaptationDurationInSeconds: 1
+
+# Points density
+PointsDensity: 0.02
+StimulusEdgeLength: 100
+StimulusWindowEdgeLength: 25
+
+sStairNumber: 1
+sStairStartStates: 0.0
+sStairAscending: 1
+sStairCorrectAnswers: 2
+sStairMaxInversions: 5
+sStairMaxTrials: 1000
+sStairPositiveStep: 2.5,2.5
+sStairNegativeStep: 2.5
+sStairClampLower: -2000.0
+sStairClampUpper: 2000.0
+sStairMaxClampHits: 10

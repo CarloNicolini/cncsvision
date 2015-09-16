@@ -1,0 +1,16 @@
+In order to correctly build the packages for 64 bit linux, please download the cmake-2.8.7 (previous versions of cmake are buggy)
+
+Required libraries  are
+
+Generic required libraries:
+sudo apt-get install freeglut3 freeglut3-dev libglew1.5 libglew1.5-dev libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev mesa-common-dev libxi-dev libxmu-dev libxmuu-dev qt4-dev-tools build-essential rpm libboost-all libboost-all-dev
+
+In order to compile GLFW you also have to install
+
+sudo apt-get install libxi-dev libxrandr-dev libxrandr2 xorg-dev x11proto-xf86vidmode-dev
+
+In order to use the Optotrak you have to install
+
+sudo apt-get install libusb-dev
+
+In order for Linux to allow custom resolutions and stereo display you have to follow the instructions to modifiy xorg.conf

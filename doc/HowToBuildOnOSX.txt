@@ -1,0 +1,30 @@
+In order to build on OSX you have to have Qt > 4.6.1 libraries installed and install glew following the instructions:
+
+I’ve been trying for a while to get GLEW (The OpenGL Extension Wrangler Library) working and finally I did it. I think this could be useful for other people. First let me define the platform this way:
+
+MacBook (2GHz Intel Core 2 Duo)
+Mac Os 10.5 (Leopard)
+Xcode version 3.0
+glew 1.9.0
+Download the last source files of GLEW (at this moment 1.4.0), be sure to downolad the .tgz file. Don’t try either the compiled or the .zip version of the files, there are some issues with them and apparently the .tgz file is the only one that works (read the newsgroup of GLEW in sourceforge for more information about this).
+
+1. Unziping and untaring the file:
+
+tar zxvf glew-1.4.0-src.tgz
+
+2. Compile the sources from a terminal window:
+
+make
+
+There are some harmless warnings that don’t affect the compilation. Watch for errors, however I didn’t have a single one.
+
+3. Install the binaries (you need superuser permissions):
+
+sudo -s
+
+make install
+
+make clean
+
+The files are copied to /usr/lib and /usr/include/GL.
+

@@ -1,0 +1,168 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "EgClientDemo.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+EGCLIENTDEMO MENU DISCARDABLE 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "Calibration"
+    BEGIN
+        MENUITEM "Calibrate",                   ID_COMMUNICATIONS_CALIBRATE
+        , GRAYED
+    END
+    POPUP "&Communications"
+    BEGIN
+        MENUITEM "&Begin Gazepoint Data Transmission", 
+                                                ID_COMMUNICATIONS_BEGIN
+        , GRAYED
+        MENUITEM "&End Gazepoint Data Transmission", ID_COMMUNICATIONS_END
+        , GRAYED
+    END
+    POPUP "&Data Log"
+    BEGIN
+        MENUITEM "&Open File",                  ID_DATALOG_OPENFILE
+        MENUITEM "&Begin Data Collection",      ID_DATALOG_BEGINDATACOLLECTION
+
+        MENUITEM "&Mark Event",                 ID_DATALOG_MARKEVENT
+        MENUITEM "&End Data Collection",        ID_DATALOG_ENDDATACOLLECTION
+        MENUITEM "&Close File",                 ID_DATALOG_CLOSEFILE
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About",                      ID_HELP_ABOUT
+    END
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "EgClientDemo.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+EGCLIENTDEMO ACCELERATORS DISCARDABLE 
+BEGIN
+    "B",            ID_DATALOG_BEGINDATACOLLECTION, VIRTKEY, NOINVERT
+    "C",            ID_DATALOG_CLOSEFILE,   VIRTKEY, NOINVERT
+    "E",            ID_DATALOG_ENDDATACOLLECTION, VIRTKEY, NOINVERT
+    "M",            ID_DATALOG_MARKEVENT,   VIRTKEY, NOINVERT
+    "O",            ID_DATALOG_OPENFILE,    VIRTKEY, NOINVERT
+    VK_ESCAPE,      ID_COMMUNICATIONS_END,  VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SELECTSERIALPORT DIALOG DISCARDABLE  0, 0, 186, 95
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CTEXT           "Enter the serial port device name",IDC_STATIC,29,9,128,
+                    34
+    EDITTEXT        IDC_SERIALPORT,53,47,80,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "Cancel",IDCANCEL,40,74,50,14
+    DEFPUSHBUTTON   "OK",IDOK,103,74,50,14
+END
+
+IDD_OPENFILE DIALOG DISCARDABLE  0, 0, 186, 95
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_FILENAME,13,39,158,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,37,74,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,102,74,50,14
+    LTEXT           "Enter the name of the file for logging data:",
+                    IDC_STATIC,13,14,158,11
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_OPENFILE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

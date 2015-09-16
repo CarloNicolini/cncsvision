@@ -1,0 +1,18 @@
+SubjectName: junk
+BaseDir: dataset\
+
+Repetitions: 10
+Randomize: 0
+IOD: 65
+
+# Points density
+StimulusType: Squares
+StimulusEdgeLength: 25
+EllipsoidRadius: 50
+PointsDensity: 0.1
+
+StimulusWindowEdgeLength: 25
+FocalDistance: -500
+
+fZDepth: -20 20
+

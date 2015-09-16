@@ -1,0 +1,45 @@
+# Comments start with #
+# List of experimental PARAMETERS:3
+
+SubjectName: junk
+
+IOD: 65
+OrthographicMode: 0
+DrawInfo: 1
+Repetitions: 1
+Randomize: 0
+
+# Density of points of "factor" surface
+DensityPointOnSurfaceFactor: 0.1
+
+# Density of points of "staircase" surface
+DensityPointOnSurfaceStaircase: 0.1
+
+# Density of points of "mask" surface
+DensityPointOnSurfaceMask: 0.01
+
+# Set the stimulus time in  milliseconds
+StimulusTime: 50
+MaskTime: 10
+
+# Set the dots size in pixels
+DotsSize: 2
+
+# Set the radius X of elliptical cylinders
+RadiusX: 50
+
+# Set the cylinder height
+Height: 80
+
+fScaleZ: 0.5 1.5
+
+sStairNumber: 2
+sStairStartStates: 0,2
+sStairAscending: 1,0
+sStairCorrectAnswers: 2,2
+sStairMaxInversions: 5,5
+sStairMaxTrials: 30,30
+sStairPositiveStep: 0.25,0.25
+sStairNegativeStep: 0.5
+sStairClampLower: 0.0
+sStairMaxClampHits: 4

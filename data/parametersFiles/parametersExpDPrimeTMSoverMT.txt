@@ -1,0 +1,37 @@
+# Comments start with #
+BaseDir: dataset\
+SubjectName: junk
+
+# We want a total of 80 trials, so 4 combinations repeated 20 times
+Repetitions: 20
+Randomize: 1
+IOD: 62
+# assma 63
+# andrea 64
+# sara 63
+# giulia 58
+# Reshanne 58
+# Angela  58
+# Francesca  58
+# Giorgia  58
+# elena  58
+# Niccolò  64
+# Matilde  58
+# dania 54
+# filippo 66
+
+
+NOscillationsFixation: 2
+# Speed limit in mm/s
+SpeedLimit: 100
+# Min and max time intervals for left-right oscillation
+MinOscillationTime: 0.2
+MaxOscillationTime: 0.5
+MaxXOscillation: 35
+# The tolerance in millimeters when the eye passes through the center (the lower the less detectable is the change)
+CenterTolerance: 0.2
+
+fOmegaY: 0 -14
+fBinocular: 0 1
+fTilt: 180
+fSlant: 45

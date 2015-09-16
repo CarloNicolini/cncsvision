@@ -1,0 +1,15 @@
+SubjectName: junk
+Mu: 20
+Sigma: 0.1
+GuessRate: 0.0
+LapseRate: 0.0
+sStairNumber: 1
+sStairStartStates: 10
+sStairAscending: 1
+sStairCorrectAnswers: 3
+sStairMaxReversals: 8
+sStairMaxTrials: 30
+sStairPositiveStep: 0.5,0.25 #ciccio
+sStairNegativeStep: 1
+sStairClampLower: 0.0
+sStairMaxClampHits: 4

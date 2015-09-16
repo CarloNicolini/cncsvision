@@ -1,0 +1,82 @@
+#### Version released on [02.02.12] ####
+
+  Changes that break backward compatibility:
+  - renamed all secondary classes from QCustomPlot[...] to QCP[...]:
+    QCustomPlotAxis -> QCPAxis
+    QCustomPlotGraph -> QCPGraph
+    QCustomPlotRange -> QCPRange
+    QCustomPlotData -> QCPData
+    QCustomPlotDataMap -> QCPDataMap
+    QCustomPlotLegend -> QCPLegend
+    QCustomPlotDataMapIterator -> QCPDataMapIterator
+    QCustomPlotDataMutableMapIterator -> QCPDataMutableMapIterator
+    A simple search and replace on all code files should make your code run again, e.g. consider the regex "QCustomPlot(?=[AGRDL])" -> "QCP".
+    Make sure not to just replace "QCustomPlot" with "QCP" because the main class QCustomPlot hasn't changed to QCP.
+    This change was necessary because class names became unhandy, pardon my bad naming decision in the beginning.
+  - QCPAxis::tickLength() and QCPAxis::subTickLength() now each split into two functions for inward and outward ticks (tickLengthIn/tickLengthOut).  
+  - QCPLegend now uses QCPAbstractLegendItem to carry item data (before, the legend was passed QCPGraphs directly)
+  - QCustomPlot::addGraph() now doesn't return the index of the created graph anymore, but a pointer to the created QCPGraph.
+
+  Added features:
+  - Reversed axis range with QCPAxis::setRangeReversed(bool)
+  - Tick labels are now only drawn if not clipped by the viewport (widget border) on the sides (e.g. left and right on a horizontal axis).
+  - Zerolines. Like grid lines only with a separate pen (QCPAxis::setZeroLinePen), at tick position zero.
+  - Outward ticks. QCPAxis::setTickLength/setSubTickLength now accepts two arguments for inward and outward tick length. This doesn't break
+    backward compatibility because the second argument (outward) has default value zero and thereby a call with one argument hasn't changed its meaning.
+  - QCPGraph now inherits from QCPAbstractPlottable
+  - QCustomPlot::addPlottable/plottable/removePlottable/clearPlottables added to interface with the new QCPAbstractPlottable-based system. The simpler interface
+    which only acts on QCPGraphs (addGraph, graph, removeGraph, etc.) was adapted internally and is kept for backward compatibility and ease of use.
+  - QCPLegend items for plottables (e.g. graphs) can automatically wrap their texts to fit the widths, see QCPLegend::setMinimumSize and QCPPlottableLegendItem::setTextWrap.
+  - QCustomPlot::rescaleAxes. Adapts axis ranges to show all plottables/graphs, by calling QCPAbstractPlottable::rescaleAxes on all plottables in the plot.
+  - QCPCurve. For plotting of parametric curves.
+  - QCPBars. For plotting of bar charts.
+  - QCPStatisticalBox. For statistical box plots.
+
+  Bugfixes:
+  - Fixed QCustomPlot::removeGraph(int) not being able to remove graph index 0
+  - made QCustomPlot::replot() abort painting when painter initialization fails (e.g. because width/height of QCustomPlot is zero)
+  - The distance of the axis label from the axis ignored the tick label padding, this could have caused overlapping axis labels and tick labels 
+  - fixed memory leak in QCustomPlot (dtor didn't delete legend)
+  - fixed bug that prevented QCPAxis::setRangeLower/Upper from setting the value to exactly 0.
+
+  Other:
+  - Changed default error bar handle size (QCustomPlotGraph::setErrorBarSize) from 4 to 6.
+  - Removed QCustomPlotDataFetcher. Was deprecated and not used class.
+  - Extended documentation, especially class descriptions.
+
+#### Version released on [15.01.12] ####
+
+  Changes that (might) break backward compatibility:
+  - QCustomPlotGraph now inherits from QObject
+  
+  Added features:
+  - Added axis background pixmap (QCustomPlot::setAxisBackground, setAxisBackgroundScaled, setAxisBackgroundScaledMode)
+  - Added width and height parameter on PDF export function QCustomPlot::savePdf(). This now allows PDF export to
+    have arbitrary dimensions, independent of the current geometry of the QCustomPlot.
+  - Added overload of QCustomPlot::removeGraph that takes QCustomPlotGraph* as parameter, instead the index of the graph
+  - Added all enums to the Qt meta system via Q_ENUMS(). The enums can now be transformed
+    to QString values easily with the Qt meta system, which makes saving state e.g. as XML
+    significantly nicer.
+  - added typedef QMapIterator<double,QCustomPlotData> QCustomPlotDataMapIterator
+    and typedef QMutableMapIterator<double,QCustomPlotData> QCustomPlotDataMutableMapIterator
+    for improved information hiding, when using iterators outside QCustomPlot code
+  
+  Bugfixes:
+  - Fixed savePngScaled. Axis/label drawing functions used to reset the painter transform
+    and thereby break savePngScaled. Now they buffer the current transform and restore it afterwards.
+  - Fixed some glitches in the doxygen comments (affects documentation only)
+  
+  Other:
+  - Changed the default tickLabelPadding of top axis from 3 to 6 pixels. Looks better.
+  - Changed the default QCustomPlot::setAntialiasedElements setting: Graph fills are now antialiased
+    by default. That's a bit slower, but makes fill borders look better.
+
+#### Version released on [19.11.11] ####
+
+  Changes that break backward compatibility:
+  - QCustomPlotAxis: tickFont and setTickFont renamed to tickLabelFont and setTickLabelFont (for
+    naming consistency)
+
+  Other:
+  - QCustomPlotAxis: Added rotated tick labels, see setTickLabelRotation
+    

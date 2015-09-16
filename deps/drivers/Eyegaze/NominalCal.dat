@@ -1,0 +1,56 @@
+Nonlinear Eyegaze Calibration Data (Full, Ef 2)
+2 1  (Vision Systems, Calibration Eyes Per Vision System)
+    0.0700  Kappa, horizontal component (rad) ( 4.01 deg)
+    0.0000  Kappa, vertical component   (rad) ( 0.00 deg)
+    5.2000  Cornea-center pupil-center distance (mm)
+    7.7000  Nominal cornea radius (mm)
+    1.2500  Cornea's elongation coefficient (unitless)
+    0.0000  Cornea's total astigmatism (unitless)
+    0.0000  Angle of astigmatism axis (rad) ( 0.00 deg)
+    0.0000  Monitor to Gimbal Rotation about Y (rad)  (  0.0 deg)
+    0.0000  Monitor to Gimbal Rotation about X (rad)  (  0.0 deg)
+    0.0000  Monitor to Gimbal Rotation about Z (rad)  (  0.0 deg)
+    0.0000  Monitor to Gimbal Offset X (mm)  (  0.00 in)
+ -165.0000  Monitor to Gimbal Offset Y (mm)  ( -5.75 in)
+   13.0000  Monitor to Gimbal Offset Z (mm)  (  0.50 in)
+    0.0000  0.0000  0.0000   total, horz and vert accuracy (in)
+    0.0000  0.0000  0.0000   total, horz and vert accuracy (mm)
+10:00:00
+Jan 15, 2010
+Right Eye
+   63.5000  Distance Between Eyes            (  2.50 in)
+   -0.0700  Kappa, horizontal component (rad) (-4.01 deg)
+    0.0000  Kappa, vertical component   (rad) ( 0.00 deg)
+    5.2000  Cornea-center pupil-center distance (mm)
+    7.7000  Nominal cornea radius (mm)
+    1.2500  Cornea's elongation coefficient (unitless)
+    0.0000  Cornea's total astigmatism (unitless)
+    0.0000  Angle of astigmatism axis (rad) ( 0.00 deg)
+    0.0000  Monitor to Gimbal Rotation about Y (rad)  (  0.0 deg)
+    0.0000  Monitor to Gimbal Rotation about X (rad)  (  0.0 deg)
+    0.0000  Monitor to Gimbal Rotation about Z (rad)  (  0.0 deg)
+    0.0000  Monitor to Gimbal Offset X (mm)  (  0.00 in)
+ -165.0000  Monitor to Gimbal Offset Y (mm)  ( -5.75 in)
+   13.0000  Monitor to Gimbal Offset Z (mm)  (  0.50 in)
+    0.0000  0.0000  0.0000   total, horz and vert accuracy (in)
+    0.0000  0.0000  0.0000   total, horz and vert accuracy (mm)
+10:00:00
+Jan 15, 2010
+Left Eye
+   63.5000  Distance Between Eyes            (  2.50 in)
+Display:    Wpx: 1023  Hpx:  767
+Monitor:    Wmm:406.0  Hmm:254.0  CrvX:0.0000  CrvY:0.0000
+Cam Sensor[0]: Wmm: 6.45  Hmm: 4.84  TotPix: I: 640 J: 480
+Cam Lens[0]:   FocalLength: 50.0
+Raw Calibration Data - 6 Cal Cycles, 10 Points PerCycle
+ #     Xcr     Ycr     Xpc     Ypc PupR  FocRn  Off GimYaw GimPit  Ex Ey(mm)
+ 0 -0.0928 -0.2826 -0.1013 -0.2763 1.83  615.4  0.5 -0.017 -0.474   0.0   0.0
+ 1 -0.0011 -0.4669  0.1440 -0.7361 1.70  619.0 -0.3 -0.020 -0.476  -6.7   7.2
+ 2 -0.0949 -0.4044 -0.1007 -0.5717 1.74  617.8  0.2 -0.017 -0.476   5.2   4.9
+ 3 -0.2113 -0.4358 -0.3540 -0.6823 1.70  620.9 -0.5 -0.014 -0.475   1.2  -2.1
+ 4 -0.1680 -0.3361 -0.2973 -0.4166 1.81  617.7  0.4 -0.014 -0.475   8.5   4.1
+
+
+57  0.0667  0.0562  0.0426 -0.1043 1.88  697.5 -0.2 -0.022 -0.291   2.5  -1.6
+58  0.0310  0.1079 -0.0210  0.0042 1.94  698.5 -0.1 -0.021 -0.290   4.0   0.2
+59  0.1011  0.1105  0.1365  0.0218 1.94  696.2  0.0 -0.024 -0.290   2.2   1.3

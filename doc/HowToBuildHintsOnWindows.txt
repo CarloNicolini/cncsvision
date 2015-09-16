@@ -1,0 +1,31 @@
+Install as follows in this order:
+
+1) Install Microsoft Visual Studio 2008
+2) Install CMake for Windows 2.8.7 or higher
+3) Install Qt 4.7.3 SDK (be sure to install the version compiled with MSVC2008 VERY IMPORTANT!)
+OPTIONAL
+4) Install NSIS (for package creation)
+5) Install 7zip for Windows
+
+Be sure that you have the following directories in your system Path:
+
+C:\Program Files (x86)\CMake 2.8\bin;
+C:\QtSDK\Desktop\Qt\4.7.3\msvc2008\bin;
+C:\QtSDK\Desktop\Qt\4.7.3\msvc2008\lib;
+C:\QtSDK\Desktop\Qt\4.7.3\msvc2008\include;
+C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\;
+C:\Program Files (x86)\7-Zip\;
+
+Open a command prompt and try to isse the following commands:
+"devenv" #This should open Visual Studio
+
+"cmake" # This should run cmake
+"7z" # this should run 7zip
+
+Once these things are done, launch deployWin32.bat by double clicking it.
+
+It starts compiling the project in Release and Debug mode and at the end it package it together with the needed Qt and Glut libraries.
+
+
+// Glew library, read
+http://glew.sourceforge.net/install.html

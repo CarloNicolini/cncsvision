@@ -1,0 +1,3 @@
+sudo apt-get install libusb-dev
+download libraries at http://www.phidgets.com/docs/Programming_Resources
+

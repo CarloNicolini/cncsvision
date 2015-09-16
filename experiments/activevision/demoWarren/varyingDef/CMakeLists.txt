@@ -1,0 +1,7 @@
+if(COMPILE_OPTOTRAK AND WIN32)
+add_executable(demoWarrenPassiveOnlyTranslationNoProbe demoWarrenPassiveOnlyTranslationNoProbe.cpp)
+target_link_libraries(demoWarrenPassiveOnlyTranslationNoProbe Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+
+add_executable(demoWarrenPassiveOnlyTranslationOccludedNoProbe demoWarrenPassiveOnlyTranslationOccludedNoProbe.cpp)
+target_link_libraries(demoWarrenPassiveOnlyTranslationOccludedNoProbe Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+endif(COMPILE_OPTOTRAK AND WIN32)

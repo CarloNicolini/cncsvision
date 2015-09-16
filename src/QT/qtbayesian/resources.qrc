@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qtbayesianicon.ico</file>
+    </qresource>
+</RCC>

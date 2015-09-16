@@ -1,0 +1,46 @@
+# Model parameters file for experiment 17 Jan 2010
+nDimensions: 6 			# number of variables to marginalize on
+nGibbsBurnIn: 100		# period of approximation to the true distributions
+nGibbsValid: 5		# valid iterations to compute integral
+
+# Translations
+sigmaOmega0x: 0.873  # 5.0*pi/180.0
+sigmaOmega0y: 0.873  # 5.0*pi/180.0
+sigmaOmega0z: 0.3
+# Rotations
+sigmaOmegax: 0.873  # 5.0*pi/180.0
+sigmaOmegay: 0.873  # 5.0*pi/180.0
+sigmaOmegaz: 0.000001
+
+sigmaGx: 2.0
+sigmaGy: 2.0
+
+ma1: 0.15	   #traslazione x  0.02389
+ma2: 0.3       #espansione/contrazione orizzontale
+ma3: 0.0       #shear orizzontale
+ma4: 0.0       #traslazione y
+ma5: -0.05       #shear verticale
+ma6: 0.0       #espansione/contrazione  verticale
+
+epsilon1: 0.05
+epsilon2: 0.05 
+epsilon3: 0.05
+epsilon4: 0.05
+epsilon5: 0.05
+epsilon6: 0.05
+
+domainMin: -0.2
+domainMax: 0.2
+domainStep: 0.025
+
+gMin: -4.0
+gMax: 4.0
+gStep: 0.1
+
+mOmegax: 0.0
+mOmegay: 0.0
+mOmegaz: 0.0
+
+mOmega0x: 0.0
+mOmega0y: 0.0
+mOmega0z: -0.3

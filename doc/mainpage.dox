@@ -1,0 +1,14 @@
+/** \mainpage CNCSVision
+* <IMG SRC="../images/logocncsvision.png" width=150 height=75>
+* This is the API documentation for CNCSVision, a C++ library for active vision and haptics experiments developed by Carlo Nicolini under the supervision of Fulvio Domini, Carlo Fantoni and Robert Volcic  used in the CNCS laboratory of Istituto Italiano di Tecnologia \@UNITN, Rovereto .
+* 
+* The Modules and Classes tabs at the top of this page give you access to the API documentation of individual classes and functions.
+* Otherwise select one of the pages here below described to jump to a particular topic.
+*\b Table \b of \b contents
+*  - \ref HowToGet
+*  - \ref HowToBuild
+*  - \ref TechnicalDetails
+*  - \ref ContactsAndLegalNotes
+*
+* Last revision 26 April 2012
+**/

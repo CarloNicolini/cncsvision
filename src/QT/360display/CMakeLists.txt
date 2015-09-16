@@ -1,0 +1,11 @@
+include_directories("${CMAKE_SOURCE_DIR}/src/eigen/unsupported")
+set(SIMULATION360_HDR GLWidgetGeometry.h GLWidgetShader.h ExperimentalParameters.h GeometricFunctions.h MainWindow.h)
+set(SIMULATION360_SRC simulation360Display.cpp GLWidgetGeometry.cpp  GLWidgetShader.cpp ExperimentalParameters.cpp GeometricFunctions.cpp MainWindow.cpp  )
+set(SIMULATION360_FORMS MainWindow.ui)
+link_libraries(${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${Boost_LIBRARIES} Core Experiment GLViz)
+QT4_WRAP_UI( SIMULATION360_FORMS_HEADERS ${SIMULATION360_FORMS} )
+QT4_WRAP_CPP( SIMULATION360_HEADERS_MOC ${SIMULATION360_HDR} )
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES})
+add_executable(simulation360Display WIN32 MACOSX_BUNDLE ${SIMULATION360_SRC} ${SIMULATION360_HDR} ${SIMULATION360_HEADERS_MOC}
+	${SIMULATION360_RESOURCES_SOURCES} ${SIMULATION360_FORMS_HEADERS} ${SIMULATION360_RCS} )
+target_link_libraries(simulation360Display ${QT_LIBRARIES} Core Experiment GLViz ${GL_LIBS})

@@ -1,0 +1,25 @@
+# Comments start with #
+# List of experimental PARAMETERS:3
+
+SubjectName: junk
+
+IOD: 65
+OrthographicMode: 1
+DrawInfo: 1
+Repetitions: 3
+Randomize: 1
+
+CirclesPerPixelSquare: 0.00015
+# White dots radius in pixels
+DotsRadiusMin: 10
+DotsRadiusMax: 40
+EllipseStepSize: 0.1
+
+# Set the stimulus time in  milliseconds
+StimulusTime: 500
+
+# Set the cylinder height in millimeters
+CylinderHeight: 80
+RadiusX: 80
+
+fScaleZ: 0.1 4

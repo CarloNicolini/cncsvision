@@ -1,0 +1,72 @@
+# Comments start with #
+# List of experimental PARAMETERS: 
+BaseDir: dataset\
+### when running the passsive condition add _filtered at the and of the name
+SubjectName: junk
+DebugVersion: 1		
+IOD: 62
+Occluder: 1
+OccluderWidth: 200
+OccluderHeight: 25
+OccluderDistance: 100 # positive is closer to the subject then the screen
+# giovanni 64
+# nicolini 65
+# nicolò 58
+# stefania 56
+# Fulvio 69
+# Filippo 65
+#Florian 59
+#Michele 61
+#Cingi 58
+#Andy 62
+Repetitions: 1
+Randomize: 1
+# oscillation time bounds in milliseconds
+MaxOscillationTime: 1600
+MinOscillationTime: 1000
+MaxXOscillation: 80
+MaxZOscillation: 30
+RandomizePlaneY: 1
+# se RandomizeOverallTilt=0 non randomizza ed il overall tilt è 1
+#RandomizeOverallTilt: 1
+# maximum allowed head rotation yaw during translation mode (degrees)
+#MaxAllowedTranslationYaw: 3
+MaxCircleRadius: 35
+# Number of cycles of oscillation needed to present the stimulus
+FixationCycles: 1
+# Number of cycles of oscillation during which the stimulus is presented
+StimulusCycles: 0
+# Translation speed of the stimulus center relative to projection point speed 1=> stimulus = proj point, 0 => fixed stimulus, -1 = opposite 
+# Onset  of stimulus: -1=BACKWARD 1=Forward
+# FORWARD 	=> FLOW=compression 
+# BACKWARD 	=> FLOW=expansion
+fOnset: 1
+# Starting angle between the two stimuli (degrees)
+fStillPlaneSlant: -25
+fDeltaSlant: 70
+fPlanesCentersYDistance: 30
+# Se OverallTilt= 0 prende le slant dei piani con i segni di fStillPlaneSlant: -20 e fDeltaSlant: 70
+# Altrimenti inverte i segni.  Nel caso in cui i segni siano invertiti inverte anche i tasti di risposta.  
+fOverallTilt: 0 1
+# Staircases parameters
+# Number of staircases
+sStairNumber: 4
+# In order, the start states of the staircases
+sStairStartStates: -0.9,-0.5,0.5,0.9
+# In order, 1 if staircase n is ascending, 0 otherwise
+sStairAscending: 1,1,0,0
+# In order, number of correct answers needed
+sStairCorrectAnswers: 3,2,2,3
+# In order, number of inversions needed to stop
+sStairMaxInversions: 5,4,4,5
+# In order, maximum number of trials
+sStairMaxTrials: 40,40,40,40
+# Size of the positive step (if a comma separated list is given then it's the reversal-step map)
+sStairPositiveStep: 0.1250,0.0833,0.0417
+# Size of the positive step after the first reversal (it's ignored if sStairPositiveStep is a comma-separated list)
+sStairPositiveStepAfterFirstReversal: 0.0833
+# Size of the negative step
+sStairNegativeStep: 0.0833
+sStairClampUpper: 0.95
+sStairClampLower: -0.95
+sStairMaxClampHits: 12

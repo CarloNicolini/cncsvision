@@ -1,0 +1,2 @@
+The timelag_angles_test1.txt contains the timelag deltaTheta and sigma_delta_theta for N=20 observations, with a simple program.
+The timelag_angles_test2.txt contains the timelag deltaTheta and sigma_delta_theta for N=20 observations, with a program that also has lights and a 3D image activated.

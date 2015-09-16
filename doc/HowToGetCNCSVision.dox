@@ -1,0 +1,21 @@
+/** 
+\page HowToGet How to get CNCSVision libraries
+\ingroup Tutorial
+
+You can download snapshots directly from our repository, though of course you can't expect as much stability as in releases. 
+
+We use Subversion versioning system, so if you don't have it, download (see \ref SubversionDownload )
+To get the latest snapshot open a terminal and type :
+
+\verbatim
+svn co http://193.205.214.36/home/svn/cncsvision cncsvision
+\endverbatim
+
+If you are using TortoiseSVN follow the link
+
+http://shibumi.net/2007/10/16/subversion-basics-for-windows-users-how-to-use-tortoise-svn/
+
+setting as URL of repository the following URL:
+http://193.205.214.36/home/svn/cncsvision
+
+*/

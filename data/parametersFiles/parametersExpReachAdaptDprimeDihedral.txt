@@ -1,0 +1,64 @@
+# Comments start with #
+# Inline comments work too
+BaseDir: C:/cncsvisiondata/dataset/junk/
+SubjectName: junk
+IOD: 65
+StimulusDensity: 0.15 # dots density on stimulus
+Repetitions: 1
+Randomize: 0
+RandomizeWithoutRepetitions: 1
+MaxReinsertions: 2
+BallRadius: 60
+CheckWrist: 0
+AudioFeedback: 1 # Feedback audio if markers are not visible (1 or 0)
+Task: Perc # Task can be MSE or Grasp (important for immediate or movement triggered visualization) or Perc
+Phase: 1 # mettere virgola per separare altrimenti non parsa gli spazi (in generale è 1, 2)
+
+# Adaptation Phase
+AdaptFinger: 1
+AdaptHapticFeedback: 1 
+AdaptMoveMonitor: 1
+AdaptOffsetEnd: 0.0
+AdaptOffsetStart: 0.0
+AdaptOffsetSteps: 1
+AdaptStimulusDuration: 3500
+AdaptStimulusHeight: 85
+AdaptStimulusRadius: 6.5
+AdaptTrials: 60
+AdaptZMin: -525
+AdaptZMax: -455
+
+# Test Phase
+fDistances: -420.0 -440.0
+fRelDepth: 0.0
+fWedgeAngle: 45
+TestStimulusTime: 4500
+TestPercentOccludedFrames: 20 # percentage missing frames during trial
+DelayTime: 1000 # milliseconds
+TestFinger: 3 #0 no finger, 1 index, 2 thumb, 3 both
+
+# Staircase parameters for the test phase
+sStairNumber: 1
+sStairStartStates: -30.0
+sStairAscending: 1
+sStairCorrectAnswers: 1
+sStairMaxInversions: 3
+sStairMaxTrials: 10
+sStairPositiveStep: 5.0
+sStairNegativeStep: 5.0
+sStairClampLower: -2000.0
+sStairClampUpper: 2000.0
+sStairMaxClampHits: 10
+
+# Additional parameters
+MaskWidth: 150
+MaskHeight: 20
+MaskDepth: 10
+UseMask: 1
+DeltaXMin: 5
+DeltaXMax: 10
+CylinderHeight: 80
+
+
+# Stimulus Parameters
+StimulusWidth: 100 #millimeters

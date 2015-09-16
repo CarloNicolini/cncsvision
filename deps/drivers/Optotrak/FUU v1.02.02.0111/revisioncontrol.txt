@@ -1,0 +1,26 @@
+Firmware Update Utility v1.02.02.111
+
+Changes:
+- builds using make, not Visual Studio.
+- USB driver doesn't need to be installed to run FUU
+- if USB interface is selected but driver missing, user is notified in both command prompt 
+	and windows app versions.
+- "Firmware Update Complete" messages always stays visible
+
+REQUIREMENTS
+-------------
+none
+
+
+REVISION CONTROL
+-----------------
+Project: x22_fw
+Stream : mkopcik_x22_fw
+Path   : sw\utils\fuu\certus
+Baseline : mkopcik_x22_fw_FUU_v1.2.2.111_runs_from_CD
+Created  : Nov 21, 2008 14:16
+
+-----------------
+
+Resource ID:2907
+NDI P/N 1050739.004

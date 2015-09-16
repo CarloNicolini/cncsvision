@@ -1,0 +1,66 @@
+Nonlinear Eyegaze Calibration Data (Individual) - Composite rms error: tot: 0.45  x: 0.36  y: 0.27 (in)
+2 1  (Vision Systems, Calibration Eyes Per Vision System)
+    0.0732  Kappa, horizontal component (rad) ( 4.19 deg)
+   -0.1132  Kappa, vertical component   (rad) (-6.49 deg)
+    4.7494  Cornea-center pupil-center distance (mm)
+   10.0737  Nominal cornea radius (mm)
+    0.8708  Cornea's elongation coefficient (unitless)
+    0.1121  Cornea's total astigmatism (unitless)
+    1.6030  Angle of astigmatism axis (rad) (91.85 deg)
+    0.0000  Monitor to Gimbal Rotation about Y (rad)  (  0.0 deg)
+   -0.0000  Monitor to Gimbal Rotation about X (rad)  ( -0.0 deg)
+    0.0000  Monitor to Gimbal Rotation about Z (rad)  (  0.0 deg)
+   -0.0000  Monitor to Gimbal Offset X (mm)  ( -0.00 in)
+ -165.0000  Monitor to Gimbal Offset Y (mm)  ( -6.50 in)
+   13.0000  Monitor to Gimbal Offset Z (mm)  (  0.51 in)
+    0.4426  0.3414  0.2816   total, horz and vert accuracy (in)
+   11.2411  8.6719  7.1527   total, horz and vert accuracy (mm)
+09:10:47
+Feb 29, 2012
+Right Eye
+   63.6142  Distance Between Eyes            (  2.50 in)
+   -0.0503  Kappa, horizontal component (rad) (-2.88 deg)
+   -0.1043  Kappa, vertical component   (rad) (-5.98 deg)
+    4.7554  Cornea-center pupil-center distance (mm)
+   12.7327  Nominal cornea radius (mm)
+    0.8170  Cornea's elongation coefficient (unitless)
+    0.0887  Cornea's total astigmatism (unitless)
+    1.6020  Angle of astigmatism axis (rad) (91.79 deg)
+    0.0000  Monitor to Gimbal Rotation about Y (rad)  (  0.0 deg)
+   -0.0000  Monitor to Gimbal Rotation about X (rad)  ( -0.0 deg)
+    0.0000  Monitor to Gimbal Rotation about Z (rad)  (  0.0 deg)
+   -0.0000  Monitor to Gimbal Offset X (mm)  ( -0.00 in)
+ -165.0000  Monitor to Gimbal Offset Y (mm)  ( -6.50 in)
+   13.0000  Monitor to Gimbal Offset Z (mm)  (  0.51 in)
+    0.4858  0.3860  0.2950   total, horz and vert accuracy (in)
+   12.3387  9.8034  7.4924   total, horz and vert accuracy (mm)
+09:10:47
+Feb 29, 2012
+Left Eye
+   63.6142  Distance Between Eyes            (  2.50 in)
+Display:    Wpx: 1600  Hpx: 1200
+Monitor:    Wmm:532.0  Hmm:300.0  CrvX:-0.0000  CrvY:-0.0000
+Cam Sensor[0]: Wmm: 6.45  Hmm: 4.84  TotPix: I: 768 K: 240
+Cam Lens[0]:   FocalLength: 50.0
+Raw Calibration Data - 1 Cal Cycles, 10 Cal Points PerCycle
+ #  Xcr(px)  Ycr(px)  Xpc(px)  Ypc(px) PupR  FocRn  Off GimYaw GimPit  Erx  Ery(mm)
+ 0 361.6104 121.2128 360.8294 120.9972 1.89  741.1  0.6 -0.025 -0.454   0.0   0.0
+ 1 379.2496 111.5384 394.3813  96.7269 1.79  681.8 -1.1  0.014 -0.489  11.9   5.3
+ 2 363.2132 112.3858 361.8605 103.5862 1.76  742.4 -0.1 -0.025 -0.454   1.3 -12.8
+ 3 354.7562 113.3540 339.1992 102.6133 1.72  742.4  0.2 -0.023 -0.454  12.9  -2.0
+ 4 356.3919 115.4233 343.1184 110.3124 1.82  742.4  0.1 -0.024 -0.454  -4.0   9.9
+ 5 385.6448 114.8567 396.8622 109.4434 1.71  742.4 -0.2 -0.024 -0.454   3.0  11.6
+ 6 381.3401 112.2250 389.2771 101.9095 1.66  742.4  1.1 -0.024 -0.454  -9.9  -3.7
+ 7 366.9012 111.1321 360.8656  99.5217 1.75  742.4  0.1 -0.024 -0.454 -14.6  -0.3
+ 8 360.4389 113.5317 350.4297 105.9973 1.79  742.4  0.3 -0.023 -0.454  -4.0  -3.3
+ 9 367.6359 115.0703 370.6076 108.6298 1.74  745.6 -1.6 -0.023 -0.454   3.9   2.7
+ 0 363.2822 137.2110 363.5736 137.1795 1.97  754.6  0.1 -0.025 -0.454   0.0   0.0
+ 1 405.2292 130.7352 419.8566 117.0023 2.02  680.9  0.2  0.014 -0.486  11.0  -0.7
+ 2 366.6154 127.9383 366.1842 119.3222 1.79  749.5  0.6 -0.025 -0.454   0.1 -12.0
+ 3 348.1035 127.3428 334.5381 116.7748 1.71  747.9  0.9 -0.024 -0.454  15.9  -0.6
+ 4 359.6608 130.5853 348.2786 125.5406 1.91  751.9  0.9 -0.024 -0.454  -7.8  10.2
+ 5 389.4715 130.9096 401.3722 125.9048 1.77  752.1  0.2 -0.024 -0.454   4.2  10.2
+ 6 384.4232 127.9676 393.0562 117.9404 1.71  752.8  0.6 -0.024 -0.454 -14.3   4.0
+ 7 369.3637 125.9313 364.3319 114.6080 1.83  755.5  0.2 -0.024 -0.454 -12.8   6.6
+ 8 363.6789 128.1994 355.0568 121.0315 1.88  755.5 -0.2 -0.023 -0.454   0.1  -9.7
+ 9 372.4748 129.7780 376.1542 123.6302 1.80  755.5 -0.0 -0.023 -0.454   6.7   0.5

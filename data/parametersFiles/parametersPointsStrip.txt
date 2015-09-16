@@ -1,0 +1,29 @@
+SubjectName: junk
+BaseDir: dataset\
+
+Repetitions: 5
+Randomize: 0
+IOD: 65
+DrawInfo: 1
+
+# stim motion can be "sinusoid", "triangle" or "sawtooth"
+CircularMask: 0
+CircularMaskRadius: 80
+InitialAdaptationTimeInMilliSeconds: 500
+InitialAdaptationFlowIncrement: 1.0
+MaxDotsPathLengthInMM: 300
+AdaptationDurationInMilliSeconds: 2000
+
+NumStimulusPoints: 100
+StimulusEdgeLength: 70
+StimulusDuration: 500
+
+fTilt:  90 270
+fSlant: 45
+fDef: 0.25
+fFlowDirection: 0
+fFlowIncrement: 1
+
+N_STRIP_POINT: 2500
+DFixation: 1
+ISO: 100

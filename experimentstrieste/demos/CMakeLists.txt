@@ -1,0 +1,6 @@
+if(COMPILE_OPTOTRAK)
+add_executable(demoBuddha2TS demoBuddha2TS.cpp)
+target_link_libraries(demoBuddha2TS Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+add_executable(demoBuddhaFixed2TS demoBuddhaFixed2TS.cpp)
+target_link_libraries(demoBuddhaFixed2TS Core Experiment GLViz ${GL_LIBS} ${Boost_LIBRARIES})
+endif(COMPILE_OPTOTRAK)

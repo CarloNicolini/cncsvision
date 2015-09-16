@@ -1,0 +1,21 @@
+SubjectName: junk
+BaseDir: dataset\
+
+Repetitions: 5
+Randomize: 0
+IOD: 65
+
+CircularMask: 0
+CircularMaskRadius: 250
+InitialAdaptationTime: 1
+MaxDotsPathLengthInMM: 200
+AdaptationDurationInSeconds: 1
+
+NumStimulusPoints: 750
+StimulusEdgeLength: 100
+StimulusDuration: 300
+
+fStepLenght: 0
+fTilt: 90
+fSlant: 45
+fDef: 0.5

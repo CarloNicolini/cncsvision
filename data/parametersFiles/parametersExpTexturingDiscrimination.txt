@@ -1,0 +1,35 @@
+# Comments start with #
+# List of experimental PARAMETERS:3
+
+SubjectName: junk
+
+IOD: 65
+OrthographicMode: 1
+DrawInfo: 1
+Repetitions: 1
+Randomize: 0
+
+CirclesPerPixelSquare: 0.000015
+# White dots radius in pixels
+DotsRadiusMin: 10
+DotsRadiusMax: 50
+
+# Set the stimulus time in  milliseconds
+StimulusTime: 1000
+MaskTime: 50
+NumMaskCircles: 500
+
+RadiusX: 50
+
+fScaleZ: 1 2
+
+sStairNumber: 4
+sStairStartStates: 0,0,3,3
+sStairAscending: 1,1,0,0
+sStairCorrectAnswers: 2,2,2,2
+sStairMaxInversions: 5,5,5,5
+sStairMaxTrials: 30,30,30,30
+sStairPositiveStep: 0.25,0.25
+sStairNegativeStep: 0.5
+sStairClampLower: 0.0	
+sStairMaxClampHits: 4

@@ -1,0 +1,23 @@
+# Comments start with #
+# List of experimental PARAMETERS:3
+
+BaseDir: dataset\TranslationRotationStaircase\
+SubjectName: junk
+
+IOD: 65
+OrthographicMode: 1
+Repetitions: 10
+Randomize: 1
+
+CirclesPerPixelSquare: 0.000005
+# White dots radius in pixels
+DotsRadiusMin: 100
+DotsRadiusMax: 500
+
+# White dots radius in pixels
+DotsRadiusMin: 10
+DotsRadiusMax: 40
+
+RadiusX: 80
+
+fScaleZ: 0 0.5 0.75 1 1.5 2

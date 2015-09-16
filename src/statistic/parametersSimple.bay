@@ -1,0 +1,29 @@
+nDimensions: 6
+nGibbsBurnIn: 50
+nGibbsValid: 150
+
+# Rotations
+sigmaOmegax: 0.035
+sigmaOmegay: 0.14
+sigmaOmegaz: 0.001
+
+sigmaGx: 4.0
+sigmaGy: 4.0
+
+a1: 0.0
+a4: 0.0
+ma26: 0.02389
+ma3: 0.0 
+ma5: 0.0      
+
+sigmaA26: 0.01
+sigmaA3:  0.01
+sigmaA5:  0.01
+
+domainMin: -0.1
+domainMax: 0.1
+domainStep: 0.0025
+
+gMin: -2.0
+gMax: 2.0
+gStep: 0.1

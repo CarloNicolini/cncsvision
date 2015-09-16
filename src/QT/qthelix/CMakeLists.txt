@@ -1,0 +1,15 @@
+set(HELICOID_HDR MainWindow.h ShaderWidget.h Helicoid.h)
+set(HELICOID_SRC helicoidSimulator.cpp MainWindow.cpp  ShaderWidget.cpp Helicoid.cpp)
+set(HELICOID_FORMS "MainWindow.ui")
+#set(HELICOID_RESOURCES "")
+link_libraries(${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${Boost_LIBRARIES} Core Experiment GLViz)
+
+#QT4_ADD_RESOURCES( HELICOID_RESOURCES_SOURCES ${HELICOID_RESOURCES} )
+QT4_WRAP_UI( HELICOID_FORMS_HEADERS ${HELICOID_FORMS} )
+QT4_WRAP_CPP( HELICOID_HEADERS_MOC ${HELICOID_HDR} )
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${QT_INCLUDES})
+
+add_executable(HelicoidSimulator WIN32 MACOSX_BUNDLE ${HELICOID_SRC} ${HELICOID_HDR} ${HELICOID_HEADERS_MOC}
+	${HELICOID_RESOURCES_SOURCES} ${HELICOID_FORMS_HEADERS} ${HELICOID_RCS} )
+target_link_libraries(HelicoidSimulator  ${QT_LIBRARIES} Core Experiment GLViz ${GL_LIBS})

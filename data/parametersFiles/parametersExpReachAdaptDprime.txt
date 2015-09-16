@@ -1,0 +1,116 @@
+# Comments start with #
+# List of experimental PARAMETERS: 
+BaseDir: dataset\
+SubjectName: junk
+# iniziali_TAcong or iniziali_IAcong
+
+IOD: 54
+
+# 1. Segnarsi e misurare la arm_length (AM) di ogni soggetto.
+# 2. Indicare e misurare la IOD di ogni soggetto.
+# 3. Training: mettere il su SubjectName Nome_TR1
+#    Impostare AdaptTrials: 60
+#    nel training AdaptZMax = -0.65*AL; AdaptZMin = -1.0*AL
+# 4. Sperimentale: 2 condizioni la prima COMFORT (C), la seconda DiSCOMFORT (D).
+# A seconda della condizione il SubjectName dovrà essere Nome_D o Nome_C.
+#    Impostare Phase: 1,2
+#    Impostare AdaptTrials: 50
+# Per uncomfortable AdaptZMin= -0.1*AL e AdaptZMax= -0.9*AL
+# Per comfortable AdaptZMin= -0.65*AL e AdaptZMax= -0.75*AL
+# XX controllare che lo -0.65*arm_length non sia inferiore a 435 altrimenti 
+# non si può fare l'esperimento.
+# esempio ArmLength di CARLO_F= 710;
+# Nel blocco uncomfortable AdaptZMin= -710; AdaptZMax= -639
+# Nel blocco comfortable AdaptZMin= -497; AdaptZMax= -426
+# 5. mettere il su SubjectName Nome_TR2. L'unica cosa diversa da Training è che AdaptTrials= 50
+
+# Linda, AM= 750, IOD= 54, 0.65= 487, 0.75= 562, 0.9= 675, 1= 750 
+# Maria, AM= 730, IOD= 56, 474	547	657	730
+# Elena, AM=720 , IOD= 54 , 0.65=468 ,0.75=540 , 0.85=648 , 0.95=720 
+# GiuliaC: IOD: 55; AM= 700, 455, 525, 630, 700
+# Antonela, AM= 710; IOD=57, 462,533,639,710
+# Elena, AM= 670  ;  IOD=54    435, 502, 603, 670
+# GiuliaB, AM= 720   ; IOD=55          468, 540, 648, 720
+# Lorenza, AM= 740  ; IOD=58           481, 555, 666, 740
+# Roberta,   AM= 690    ; IOD=59        448, 517, 621, 690
+# Valentina G,  AM= 730    ; IOD=55       474, 547, 657, 730
+# Kety, AM= 650        IOD=59             422, 487, 585, 650
+# Ferdi AM=715, 465	536.25	643.5	715
+# Ilaria AM=690  ;  IOD=58      448; 517; 621; 690
+# Irene AM=700  ; IOD=55        455; 525; 630; 700
+# Silvia AM=660     ; IOD=56     429; 495; 594; 660
+# Alessandro AM=740    ;  IOD=61      481; 555; 666; 740 
+# Marco    AM=680     ;    IOD=58     442; 510; 612; 680
+# Miriam AM=740    ;    IOD=53      481; 555; 666; 740
+# Valeria    AM=720   ;   IOD=52       468, 540, 648, 720
+# Alessandra  AM=720    ;    IOD=50    468, 540, 648, 720
+# Tatiana   AM=670    ;   IOD=56    435; 502; 603; 670
+# Alberto    AM=780     ;   IOD=59    507; 585; 702; 780
+# Luca       AM=770    ;    IOD=60    500; 577; 693; 770
+
+# finger to use in phase 1 : thumb=0 , index=1, both=2
+AdaptFinger: 1
+
+Repetitions: 1
+Randomize: 1
+RandomizeWithoutRepetitions: 1
+MaxReinsertions: 2
+BallRadius: 60
+# Feedback audio if markers are not visible (1 or 0)
+AudioFeedback: 1
+# Task can be MSE or Grasp (important for immediate or movement triggered visualization) or Perc
+Task: Perc
+# mettere virgola per separare altrimenti non parsa gli spazi (in generale è 1, 2)
+Phase: 1,
+# Adapt Stimulus depth range [mm]
+AdaptZMin: -525
+AdaptZMax: -455
+
+######## Adaptation phase ######## (corrisponde a phase 1)
+AdaptTrials: 60
+
+# STIMULUS ALIGNMENT
+#StimulusRodOffsetY: -65
+#StimulusRodOffsetY: 0
+######### TEST PHASE ########## (corrisponde a fase 0,2)
+#Draw3Rods: 1
+# Width axis of the ellipse (if the two values are same -> constant width)
+DeltaXMin: 13.0
+DeltaXMax: 20.0
+fDistances: -500.0
+# rel depth axis of the ellipse
+fFaces: 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31
+fRelDepth: 13
+fStimulusHeight: 70
+#TestStimulusHeight: 70
+#TestStimulusRadius: 6.5
+TestStimulusDuration: 4500
+# da inserire in percentuale non in millisecondi # FRAME MANCANTI %
+TestPercentOccludedFrames: 20
+# da inserire in millisecondi
+DelayTime: 1000
+
+# c'è il feedback tattile 1 l'oggetto va dove c'è lo stimolo, 0 oggetto lontano
+AdaptHapticFeedback: 1
+# Muove il monitor durante la fase adaption ad ogni trial
+AdaptMoveMonitor: 1
+# offset del dito: - Braccio allungato (Haptic Feedback più vicino), + Braccio accorciato
+AdaptOffsetStart: 0.0
+# Offset finale
+AdaptOffsetEnd: 0.0
+# Numero di passi da iniziale a finale
+AdaptOffsetSteps: 1
+# Durations in milliseconds
+AdaptStimulusDuration: 3500
+AdaptStimulusHeight: 85
+AdaptStimulusRadius: 6.5
+
+# Offset between rod visualization and markers 15
+AdaptStimulusOffz: 15
+AdaptStimulusOffy: -30
+AdaptStimulusOffx: -8
+
+# Test finger (viene usato solo per scrivere nel markersFile e rappresenta il dito nelle fasi test)
+# thumb=0 , index=1, both=2
+TestFinger: 1# Dot density on the surface of the stimuli (in all phases)
+StimulusDensity: 0.015

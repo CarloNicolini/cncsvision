@@ -1,0 +1,65 @@
+# Comments start with #
+# List of experimental PARAMETERS: 
+BaseDir: dataset\
+SubjectName: junk
+# iniziali_TAcong or iniziali_IAcong
+IOD: 70
+
+# finger to use in phase 1 : thumb=0 , index=1, both=2
+AdaptFinger: 0
+
+Repetitions: 10
+Randomize: 1
+RandomizeWithoutRepetitions: 1
+MaxReinsertions: 2
+BallRadius: 60
+# Feedback audio if markers are not visible (1 or 0)
+AudioFeedback: 1
+# Task can be MSE or Grasp (important for immediate or movement triggered visualization)
+Task: Grasp
+# mettere virgola per separare altrimenti non parsa gli spazi
+Phase: 1,2
+# STIMULUS ALIGNMENT
+#StimulusRodOffsetY: -65
+#StimulusRodOffsetY: 0
+######### TEST PHASE ########## (corrisponde a fase 0,2)
+#Draw3Rods: 1
+# Width axis of the ellipse (if the two values are same -> constant width)
+DeltaXMin: 13.0
+DeltaXMax: 13.0
+fDistances: -440.0  -500.0
+# rel depth axis of the ellipse
+fRelDepth: 13
+fStimulusHeight: 20 40
+#TestStimulusHeight: 70
+#TestStimulusRadius: 6.5
+TestStimulusDuration: 2500
+# da inserire in percentuale non in millisecondi
+TestPercentOccludedFrames: 20
+# da inserire in millisecondi
+DelayTime: 500
+######## Adaptation phase ######## (corrisponde a phase 1)
+AdaptTrials: 60
+# c'è il feedback tattile 1 l'oggetto va dove c'è lo stimolo, 0 oggetto lontano
+AdaptHapticFeedback: 1
+# Muove il monitor durante la fase adaption ad ogni trial
+AdaptMoveMonitor: 1
+# offset del dito: - più lontano, + più vicino
+AdaptOffsetStart: 0.0
+# Offset finale
+AdaptOffsetEnd: 0.0
+# Numero di passi da iniziale a finale
+AdaptOffsetSteps: 1
+# Stimulus depth range [mm]
+AdaptZMin: -520
+AdaptZMax:  -420
+# Durations in milliseconds
+AdaptStimulusDuration: 2500
+AdaptStimulusHeight: 70
+AdaptStimulusRadius: 6.5
+
+# Test finger (viene usato solo per scrivere nel markersFile e rappresenta il dito nelle fasi test)
+# thumb=0 , index=1, both=2
+TestFinger: 2
+# Dot density on the surface of the stimuli (in all phases)
+StimulusDensity: 0.015

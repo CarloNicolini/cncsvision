@@ -1,0 +1,18 @@
+;-----------------------------------------------------------------------------
+; etherlink.def: Module definition file for linking the Microsoft VC++ 5.0
+; compiled DLL 'etherlink.dll'.
+;-----------------------------------------------------------------------------
+
+LIBRARY     etherLINK
+
+DESCRIPTION 'Ethernet Support DLL for Windows32 version of Optotrak API'
+CODE        PRELOAD MOVEABLE DISCARDABLE
+DATA        PRELOAD MOVEABLE SINGLE
+HEAPSIZE    1024
+
+EXPORTS     LinkOpen
+            LinkWrite
+            LinkRead
+            LinkClose
+            LinkStatus
+            LinkReset

@@ -1,0 +1,1 @@
+1.0    Pulser Gain Factor (nominal value = 1.0)

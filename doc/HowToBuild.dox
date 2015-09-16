@@ -1,0 +1,143 @@
+/** 
+\page HowToBuild Installation and building on Linux, MacOSX, Windows
+
+In these page we will explain how to build the whole codebase from source and build your own examples with the minimum set of tools.
+CNCSVision is C++98 standard, so your compiler must have to meet the newest compiler requirements. For questions, please contact carlo.nicolini@iit.it. 
+
+\b Table \b of \b contents
+  - \ref GetTheTools
+  - \ref BuildOnWindows
+  - \ref BuildOnLinux
+  - \ref BuildOnMac
+
+\section GetTheTools Tools and libraries needed to build CNCSVISION
+As first thing you have to install CMake on your system. We use CMake to generate appropriate generators for the project in order to be as more cross-platform as possible.
+Go to 
+  - www.cmake.org
+and download the latest version (we tested the build process under cmake-2.87, so if you have previous versions of cmake, get the newest one).
+CMake is given under different flavours, please install the version of your operating system.
+
+A quite comprehensive but simple introduction to CMake is available at http://eris.liralab.it/wiki/CMake
+
+Dependently on your operating system you must have a valid C++ compiler (we are tested under gcc-4.0 or newer for Unix environments and MSVC2008 or newer for Windows environment).
+
+CNCSVISION is tested to build under:
+  - Linux
+  - OSX
+  - Windows
+
+although some libraries are only available for Windows (the Optotrak libraries for example).
+  
+The external dependencies of CNCSVISION are
+  - Boost C++ libraries (you can install everything but Boost::Graph if hard drive space is an issue)
+  - GLUT + OpenGL drivers
+  - Optotrak proprietary device drivers and libraries
+  - InteractiveMinds Eyegaze and EyeFollower device drivers and libraries.
+  - Qt libraries (version >4.7.3)
+  
+\section BuildOnLinux How to build under Linux
+The full library is developed and written under Linux. 
+Although complete experiments using the Optotrak can be built under Linux too, we don't run experiments on a Linux machine because of non-compatibility of other device drivers, but the Linux build remains a very valid tool to check the correctness of the implementation of classes and is needed to carry out complete and accurate testing.
+
+The needed packages to build the library (with its Qt based programs too) are
+  - freeglut3
+  - freeglut3-dev
+  - libglew1.5
+  - libglew1.5-dev
+  - libglu1-mesa
+  - libglu1-mesa-dev
+  - libgl1-mesa-glx
+  - libgl1-mesa-dev
+  - mesa-common-dev
+  - libxi-dev
+  - libxmu-dev
+  - libxmuu-dev
+  - qt4-dev-tools
+  - build-essential
+  - libboost-all
+  - libboost-all-dev
+  
+In Debian based distros you can get those packages with apt-get
+
+\code
+sudo apt-get install freeglut3 freeglut3-dev libglew1.5 libglew1.5-dev libglu1-mesa libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev mesa-common-dev libxi-dev libxmu-dev libxmuu-dev qt4-dev-tools build-essential rpm libboost-all libboost-all-dev
+\endcode
+
+
+Once all these packages are installed, you can try to build the library, with all its examples and test by simply issuing
+\code
+	cmake .
+	make
+\endcode
+This will launch a long build process, that should issue no errors. After that you will have the tests executables in the folder
+\verbatim
+	cncsvision/build/
+\endverbatim
+
+Please contact us if you have some doubts or questions, or you are not able to build the project.
+
+\section BuildOnWindows How to build under Windows
+We support evey Windows version from Windows XP.
+The requirements to build correctly the CNCSVISION are 
+  - Install Microsoft Visual Studio 2008 or higher
+  - Install CMake for Windows 2.8.7 or higher
+  - Install Qt 4.7.3 SDK
+
+
+Be sure that you have the following directories in your system Path:
+
+C:\Program Files (x86)\CMake 2.8\bin;
+C:\QtSDK\Desktop\Qt\4.7.3\msvc2008\bin;
+C:\QtSDK\Desktop\Qt\4.7.3\msvc2008\lib;
+C:\QtSDK\Desktop\Qt\4.7.3\msvc2008\include;
+C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\;
+
+IMPORTANT:
+Regarding the QT part, be sure to install the Qt version compiled with the very same compiler you use on your build machine.
+This will avoid a bunch of problems in linking phase.
+A working pair is Qt_SDK_1_1_2 with Microsoft VisualStudio 2008.
+
+Install the latest Boost libraries by downloading them from BoostPro www.boostpro.com/download/
+Be sure to install them in every flavour for your compiler
+
+  - Multithreaded debug DLL
+  - Multithreaded DLL
+  - Multithreaded
+  - Multithreaded debug
+  - Multithreaded, static runtime
+  - Multithreaded debug, static runtime
+  - Single threaded, static runtime
+  - Single threaded debug, static runtime
+  
+Install everything but Boost::Graph, it's not needed for CNCSVISION.
+Once Boost is installed you can try to compile the project.
+Open Cmake and write the path of your CNCSVISION checkout in order to generate a VisualStudio 2008 solution for CNCSVISION.
+CMake will help you in the process of finding other required missing libraries.
+
+\section FAQ
+Here is the list of all possible question that can arise during using the library.
+<ul>
+<li> When I move the executable from the computer where I've compiled it to another one, system complains because in some way can't find glut32. </li>
+<ul>
+<li> If your message is one of the following:
+    - "Glut32.dll Not Found"
+    - "This application failed to start because glut32.dll was not found. Re-installing the application may fix this problem."
+    - "Cannot find [PATH]\glut32.dll"
+    - "The file glut32.dll is missing."
+    - "Cannot start [APPLICATION]. A required component is missing: glut32.dll. Please install [APPLICATION] again."
+    
+then is because there is no glut32 libraries at all on your platform. Download the glut32 libraries from http://www.xmission.com/~nate/glut.html and extract it in the folder where your executable resides. Otherwise copy 
+\b glut32.lib \b and glut32.dll to \verbatim c:\windows\system32\ \endverbatim</li>
+</li>
+If you have problems setting up glut32 on VisualStudio I suggest you to read the following, well explained, website http://3dgep.com/?p=636#OpenGL_Project
+
+</ul>
+</ul>
+
+\section BuildOnMac How to build under OSX
+
+Install macport
+sudo port install boost
+sudo ln -s /opt/local/include/boost /usr/include/boost 
+TODO
+*/

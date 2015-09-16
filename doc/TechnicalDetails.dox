@@ -1,0 +1,8 @@
+/** 
+\page TechnicalDetails Technical details of CNCSVISION
+
+\section FrameRateNotes Implementation notes about framerates
+
+\section Stereo120HzNotes How to setup a stereo system
+http://cismm.cs.unc.edu/core-projects/visualization-and-analysis/setting-up-a-simple-stereo-system/
+**/

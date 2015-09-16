@@ -1,0 +1,50 @@
+         Marker Description File
+
+Real 3D
+6       ;Number of markers
+1       ;Number of different views
+Front
+Marker       X          Y         Z      Views
+1                   2.1985      -15.8936       86.8858    1
+2                   2.1985       15.7071       86.8858    1
+3                   1.7975       15.7819      131.3168    1
+4                   1.5955       15.7645      175.8451    1
+5                   1.8280      -15.7077      175.8297    1
+6                   2.1985      -15.8136      131.3926    1
+
+Normals
+
+Marker       X          Y         Z
+        1.0000        0.0000        0.0000
+        1.0000        0.0000        0.0000
+        1.0000        0.0000        0.0000
+        1.0000        0.0000        0.0000
+        1.0000        0.0000        0.0000
+        1.0000        0.0000        0.0000
+
+MaxSensorError
+0.20
+
+Max3dError
+0.50
+
+MarkerAngle
+60
+
+3dRmsError
+0.50
+
+SensorRmsError
+0.10
+
+MinimumMarkers
+4
+
+MinSpread1
+0
+
+MinSpread2
+0
+
+MinSpread3
+0

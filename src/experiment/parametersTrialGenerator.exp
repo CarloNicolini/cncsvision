@@ -1,0 +1,19 @@
+SubjectName: Renato
+IOD: 65
+Repetitions: 1
+Randomize: 1
+
+fSlant: 0
+fTilt: 0 
+
+# Lists are comma separated
+sStairNumber: 4
+sStairStartStates: 1,0.5,-0.5,-1
+sStairAscending: 0,0,1,1
+sStairCorrectAnswers: 1,1,1,1
+sStairMaxInversions: 50,50,50,50
+sStairMaxTrials: 1000,1000,1000,1000
+sStairPositiveStep: 0.1,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3,1,2,3
+sStairPositiveStepAfterFirstReversal: 500
+sStairNegativeStep: 0.5
+

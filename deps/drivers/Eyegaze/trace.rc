@@ -1,0 +1,226 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "Trace.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "Trace.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+TRACE MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "Select &Text...",             ID_FILE_SELECTTEXT
+        MENUITEM "Select &Bitmap",              ID_FILE_SELECTBITMAP
+        MENUITEM "Set Replay &Speed...",        ID_FILE_SETREPLAYSPEED
+        MENUITEM "Set &Collection Time...",     ID_FILE_SETCOLLECTIONTIME
+        MENUITEM SEPARATOR
+        MENUITEM "Auto Save Data",              ID_FILE_AUTOSAVEDATA
+        MENUITEM SEPARATOR
+        MENUITEM "&Print Screen",               ID_FILE_PRINTSCREEN
+        MENUITEM "S&ave Bitmap of Screen",      ID_FILE_SAVEBITMAP
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit",                       ID_FILE_EXIT
+    END
+    POPUP "Calibration"
+    BEGIN
+        MENUITEM "&Calibrate \tC",              ID_TRACKGAZE_CALIBRATE
+    END
+    POPUP "&Display"
+    BEGIN
+        MENUITEM "Clear Screen\tW",             ID_TRACKGAZE_CLEARSCREEN
+    END
+    POPUP "&Collect Data"
+    BEGIN
+        MENUITEM "&Begin\tB",                   ID_COLLECTDATA_START
+        MENUITEM "&End\tE",                     ID_COLLECTDATA_STOP, GRAYED
+    END
+    POPUP "&Replay"
+    BEGIN
+        MENUITEM "&Load Data File",             ID_REPLAY_LOADDATAFILE
+        MENUITEM SEPARATOR
+        MENUITEM "Replay Complete &Raw Trace",  ID_DISPLAY_DISPLAYCOMPLETERAWTRACE
+
+        MENUITEM "Replay &Moving Trace",        ID_DISPLAY_DISPLAYMOVINGTRACE
+
+        MENUITEM SEPARATOR
+        MENUITEM "Toggle Raw Trace\tR",         ID_DISPLAY_TOGGLERAWTRACE
+        MENUITEM "Toggle Fixation Trace\tF",    ID_DISPLAY_TOGGLEFIXATIONTRACE
+
+        MENUITEM "Toggle Time Plot\tT",         ID_DISPLAY_TOGGLETIMEPLOT
+        MENUITEM "Toggle Screen Display\tD",    ID_DISPLAY_TOGGLESCREENDISPLAY
+
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About Trace",                ID_HELP_ABOUT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SET_REPLAY_SPEED DIALOG  0, 0, 225, 122
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Set Replay Speed"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,51,101,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,122,101,50,14
+    CTEXT           "     SET THE GAZEPOINT REPLAY SPEED FACTOR",IDC_STATIC,
+                    7,7,211,8
+    EDITTEXT        IDC_EDIT1,81,70,66,15,ES_AUTOHSCROLL
+    CTEXT           "Replay speed is measured relative to real time.",
+                    IDC_STATIC,7,20,211,8
+    CTEXT           "Examples:   0.5  --  trace runs at half real speed",
+                    IDC_STATIC,7,33,211,8
+    CTEXT           "1.0  --  trace runs at real speed",IDC_STATIC,7,44,211,
+                    8
+    CTEXT           "2.0  --  trace runs at twice real speed",IDC_STATIC,7,
+                    55,211,8
+END
+
+IDD_SET_COLLECTION_TIME DIALOG  0, 0, 186, 81
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Set Data Collection Time"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,38,60,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,102,60,50,14
+    CTEXT           "Set Gazepoint Data Collection Time (Seconds)",
+                    IDC_STATIC,7,7,171,8
+    EDITTEXT        IDC_EDIT1,65,27,55,15,ES_AUTOHSCROLL
+END
+
+IDD_GET_USER_ID DIALOG  0, 0, 186, 95
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Enter User ID"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT1,13,31,157,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "OK",IDOK,109,65,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,38,65,50,14
+    LTEXT           "Please Enter User ID",IDC_STATIC,13,19,67,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_SET_REPLAY_SPEED, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 218
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 115
+    END
+
+    IDD_SET_COLLECTION_TIME, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 178
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 74
+    END
+
+    IDD_GET_USER_ID, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 179
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 88
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+TRACE ACCELERATORS 
+BEGIN
+    "B",            ID_COLLECTDATA_START,   VIRTKEY, NOINVERT
+    "E",            ID_COLLECTDATA_STOP,    VIRTKEY, NOINVERT
+    "F",            ID_DISPLAY_TOGGLEFIXATIONTRACE, VIRTKEY, NOINVERT
+    "R",            ID_DISPLAY_TOGGLERAWTRACE, VIRTKEY, NOINVERT
+    "D",            ID_DISPLAY_TOGGLESCREENDISPLAY, VIRTKEY, NOINVERT
+    "T",            ID_DISPLAY_TOGGLETIMEPLOT, VIRTKEY, NOINVERT
+    "C",            ID_TRACKGAZE_CALIBRATE, VIRTKEY, NOINVERT
+    "C",            ID_TRACKGAZE_CALIBRATE, VIRTKEY, ALT, NOINVERT
+    "W",            ID_TRACKGAZE_CLEARSCREEN, VIRTKEY, NOINVERT
+    "B",            ID_TRACKGAZE_LOOKATBITMAP, VIRTKEY, ALT, NOINVERT
+    "T",            ID_TRACKGAZE_READTEXT,  VIRTKEY, ALT, NOINVERT
+    "N",            ID_REPLAY_DISPLAYIMAGENAMEINIMAGE, VIRTKEY, NOINVERT
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
