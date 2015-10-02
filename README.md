@@ -1,4 +1,3 @@
-=====
 CNCSVision
 =====
 
@@ -6,22 +5,20 @@ CNCSVision
 A library for experiments in visual perception, psychophysics and visualization.
 -------------------------------------------------
 
-:Author: Carlo Nicolini
-
 
 Requirements
 ------------
 
 This is the minimal list of what you need to compile *cncsvision* on Windows, Linux and OSX.
 
-- cmake _Cmake
+- cmake Cmake_
 - C/C++ compiler (`gcc`, `clang`, Microsoft Visual Studio `msvc`)
-- _boost
+- boost_ C++ libraries
+
+.. _CMake: http://www.cmake.org
+.. _boost: http://www.boost.org
 
 Informations on how to compile Boost on Windows are given in the following sections.
-
-.. _Cmake: www.cmake.org
-.. _boost: www.boost.org
 
 Compilation on Linux (tested on Ubuntu 12.04 and newer)
 -----------
