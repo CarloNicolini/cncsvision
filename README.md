@@ -47,6 +47,7 @@ You can issue the following command on the command line to install everything:
 
     $> sudo apt-get install build-essential libboost-all-dev freeglut3-dev libglew-dev  libglu1-mesa-dev libgl1-mesa-glx libgl1-mesa-dev mesa-common-dev libxi-dev libxmu-dev libxmuu-dev qt4-dev-tools
 
+
 ## CMake compile-time options
 You can compile all the experiments by specifying `cmake` flags when creating the project. You do this in the following way:
 
