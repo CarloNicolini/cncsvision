@@ -102,6 +102,7 @@ include_directories(${Boost_INCLUDE_DIR})
 ##########  CROSS-PLATFORM OPENGL + GLUT + GLEW  ########################
 ############################ FIND OPENGL EXTENSIONS GLEW ################
 find_package(GLEW)
+message(WARNING "Please update the glew source dir with latest glew")
 if(NOT GLEW_FOUND)
   message (FATAL_ERROR "GLEW not found! CNCSVision needs GLEW libraries in order to support advanced rendering options.")
 endif()
