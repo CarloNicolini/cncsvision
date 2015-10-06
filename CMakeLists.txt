@@ -22,7 +22,7 @@ option(COMPILE_LIB_NOISE "Compile libnoise from source" OFF)
 option(PHIDGET_SUPPORT "Use the Phidget libraries, (must install the drivers)" OFF)
 option(PYTHON_SUPPORT "Compile Cython extension to make CNCSVision available as Python library" OFF)
 option(QT5_SUPPORT "Compile and link the Qt5 related examples and libraries" OFF)
-	
+
 if (COMPILE_LAB_BROWN_SIMULATION)
     add_definitions("-DSIMULATION")
 endif (COMPILE_LAB_BROWN_SIMULATION)
@@ -58,8 +58,8 @@ endif(COMPILE_OPTOTRAK)
 # Support for GLW, please keep it up-to-date running a git pull on "deps/glfw3"
 if(COMPILE_GLFW)
     # See http://www.glfw.org/docs/latest/build.html
-    add_subdirectory("${PROJECT_SOURCE_DIR}/deps/glfw")
-    set(GLFW_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/deps/glfw/include")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/deps/glfw-3.1.1")
+    set(GLFW_INCLUDE_DIR "${PROJECT_SOURCE_DIR}/deps/glfw-3.1.1/include")
     # "if The Xf86VidMode library and headers were not found"
     # On Ubuntu 12.04 LTS need to install
     # sudo apt-get install xorg-dev  libglu1-mesa-dev
