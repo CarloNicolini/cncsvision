@@ -58,7 +58,7 @@ where ``{XXX}`` is one of the following:
 - **COMPILE_TESTS**
 
   Set it to `True` to compile all the test executables for all CNCSVision classes.
-  
+
 - **COMPILE_OPTOTRAK**
 
   Set it to `True` if you want CNCSVision support and compile `Optotrak` related classes.
@@ -87,7 +87,7 @@ where ``{XXX}`` is one of the following:
 
 - **PHIDGET_SUPPORT**
 
-  Set it to `True` to allow support of Phidgets www.phidgets.com in some experiments.
+  Set it to `True` to allow support of Phidgets www.phidgets.com in some experiments. Needed only when using `COMPILE_LAB_BROWN_EXPERIMENTS` flag.
 
 - **PYTHON_SUPPORT**
 
@@ -101,18 +101,19 @@ where ``{XXX}`` is one of the following:
 ### Options supported only under Windows
 
 - **EYEGAZE_SUPPORT**
-  Support for the Eyegaze eye-follower device.
+  Support for the Eyegaze eye-follower device.  Dependencies and libraries are in the `deps/drivers/Eyegaze` folder.
 
 - **ALP_SUPPORT**
-  Support for the ultra-high-speed ALP projector.
+  Support for the ultra-high-speed ALP projector. Dependencies and libraries are in the `deps/drivers/ALP` folder.
 
 - **SMI_SUPPORT**
-  Support for the SmartMotor Interfaces.
+  Support for the SmartMotor Interfaces. Dependencies and libraries are in the `deps/drivers/SMI` folder.
 
 
 FAQ
 ---
 
+(to be filled)
 
 
 Compiling Boost on Windows
@@ -139,8 +140,7 @@ These steps are written and tested for compilation of Boost >= 1.59, Windows 7 (
 - If you don't have these folders, you should try again to build the libraries (from step 5).
 
 
-
 References
 ----------
 
-[1] Nicolini, C., Fantoni, C., Mancuso, G., Volcic, R., & Domini, F. (2014). 'A framework for the study of vision in active observers.' In: Human Vision and Electronic Imaging XIX, Rogowitz, B.E., Pappas, T.N. and de Ridder, H. (eds.), Proceedings of SPIE, 9014.
+[1] Nicolini, C., Fantoni, C., Mancuso, G., Volcic, R., & Domini, F. (2014). A framework for the study of vision in active observers.' In: Human Vision and Electronic Imaging XIX, Rogowitz, B.E., Pappas, T.N. and de Ridder, H. (eds.), Proceedings of SPIE, 9014.
