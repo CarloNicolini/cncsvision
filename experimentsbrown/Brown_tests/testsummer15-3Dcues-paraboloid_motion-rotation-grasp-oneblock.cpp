@@ -493,6 +493,14 @@ void drawInfo()
 
 		glColor3fv(glWhite);
 		text.draw(" " );
+		if ( abs(270 - abs(markers.at(phidgets1).p.z())) < 3.0 )
+			glColor3fv(glGreen);
+		else
+			glColor3fv(glRed);
+		text.draw("Front Rod Z = " +stringify<double>(markers.at(phidgets1).p.z()));
+
+		glColor3fv(glWhite);
+		text.draw(" " );
 		text.draw("Index" );
 
 		if ( isVisible(markers.at(ind1).p) && isVisible(markers.at(ind2).p) && isVisible(markers.at(ind3).p) )
@@ -977,7 +985,7 @@ void initTrial()
 
 		// set the phidgets
 		stepper_rotate(rotTable, objtheta * 180.0 / M_PI);
-		phidgets_linear_move(objside-30.0, axisZ);
+		phidgets_linear_move(objside-8.0, axisZ);
 
 		// draw the stimulus	
 		beepOk(0);

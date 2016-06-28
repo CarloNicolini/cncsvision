@@ -32,8 +32,9 @@
 #include <map>
 #include <Eigen/Core>
 #include <Eigen/Geometry>
-#include <direct.h>
-/********* BOOOST MULTITHREADED LIBRARY ****************/
+#include <algorithm>
+
+/********* BOOST MULTITHREADED LIBRARY ****************/
 #include <boost/thread/thread.hpp>
 #include <boost/asio.hpp>	//include asio in order to avoid the "winsock already declared problem"
 
@@ -44,6 +45,7 @@
 
 #ifdef __linux__
 #include <GL/glut.h>
+#include <SOIL/SOIL.h>
 #endif
 
 #ifdef _WIN32
@@ -69,46 +71,59 @@
 #include "BalanceFactor.h"
 #include "ParametersLoader.h"
 #include "Util.h"
-
-#define BROWN 
-#ifdef BROWN
 #include "BrownMotorFunctions.h"
-#else
-#include "RoveretoMotorFunctions.h"
+#include "BrownPhidgets.h"
+
+/***** CALIBRATION FILE *****/
+#include "LatestCalibration.h"
+
+/***** DEFINE SIMULATION *****/
+//#define SIMULATION
+#ifndef SIMULATION
+	#include <direct.h> // mkdir
 #endif
+
 /********* NAMESPACE DIRECTIVES ************************/
 using namespace std;
 using namespace mathcommon;
 using namespace Eigen;
 using namespace util;
 using namespace BrownMotorFunctions;
+using namespace BrownPhidgets;
+
 /********* #DEFINE DIRECTIVES **************************/
 #define TIMER_MS 11                               // 85 hz
 #define SCREEN_WIDTH  1024 //1280                 // 1024 pixels
 #define SCREEN_HEIGHT 768 //1024                  // 768 pixels
-static const double SCREEN_WIDE_SIZE = 306; //360 // 306 millimeters
-/********* CALIBRATION ON CHIN REST (18 October 2011) **/
-// Alignment between optotrak z axis and screen z axis
-double alignmentX =  33.5;
-double alignmentY =  33;
-double focalDistance = -270.0;
-double homeFocalDistance =-270.0;
-static const Vector3d calibration(160,179,-75);
+
 static const Vector3d center(0,0,focalDistance);
 
 Screen screen;
 double mirrorAlignment = 0.0;
 double screenAlignmentY = 0.0;
 double screenAlignmentZ = 0.0;
+double phidgetsAlignment=0.0;
+
+/************** PHIDGETS VARIABLES ********************/
+const int axisZ = 1;
+CPhidgetStepperHandle rotTable;
+
 /********* VARIABLES OBJECTS  **************************/
 VRCamera cam;
-Optotrak2 *optotrak;
+Optotrak2 optotrak;
 CoordinatesExtractor headEyeCoords, thumbCoords, indexCoords, upperPin, lowerPin;
 Timer timer;
 Timer globalTimer;
 clock_t t;
 GLUquadric* qobj;
 /********* VISUALIZATION AND STIMULI *******************/
+#ifndef SIMULATION
+	static const bool gameMode=true;
+	static const bool stereo=true;
+#else
+	static const bool gameMode=false;
+	static const bool stereo=false;
+#endif
 
 // Display
 double displayDepth = -400;
@@ -118,10 +133,9 @@ float displayTop = 75;
 float displayBottom = -125;
 
 // Virtual target objects
-double cylL_x=-64, cylL_y=-5, cylL_z=displayDepth, cylL_pitch=90;
-double cylR_x=38, cylR_y=-5, cylR_z=displayDepth, cylR_pitch=90;
-double cylRad = 5;
+double cylRad = 4;
 double cylHeight = 40;
+double cyl_x=45, cyl_y=cylHeight/2, cyl_z=displayDepth, cyl_pitch=90;
 
 double spinCounter = 0;
 bool spin = false;
@@ -131,8 +145,8 @@ double spinDelta = 5;
 bool isSquareDrawn=false;
 double edge = 0.0, dedge = 0, xedge = 0.0, zedge = 0.0, jitter = 0.0, theta=90, phi=M_PI*3/4, dz = 0.0, dx = 0.0, r = 0.0, fdx = 1.0, axz = 1.0;
 
-int texture[2];
-int illusionID=0;
+// int texture[2];
+int illusion=0;
 
 bool openloop = false;
 
@@ -142,22 +156,34 @@ GLfloat LightDiffuse[] = {1.0f, 1.0f, 1.0f, 1.0f};
 GLfloat LightPosition[] = {0.0f, 100.0f, -100.0f, 1.0f};
 
 /********* EYES AND MARKERS ****************************/
-Vector3d eyeLeft, eyeRight, index, thumb, wrist, platformFingers(0,0,0), platformIndex(0,0,0), platformThumb(0,0,0), singleMarker, upperPinMarker(0,0,0), lowerPinMarker(0,0,0);
+// fingers markers numbers
+int ind1 = 13, ind2 = 14, ind3 = 16;
+int thu1 = 15, thu2 = 17, thu3 = 18;
+int calibration1 = 1, calibration2 = 2;
+int calibrationobj1 = 8, calibrationobj2 = 11, calibrationobj3 = 12;
+int screen1 = 19, screen2 = 20, screen3 = 21;
+int mirror1 = 6, mirror2 = 7;
+int phidgets1 = 3, phidgets2 = 4;
+
+Vector3d eyeLeft, eyeRight, ind, thm, wrist, platformFingers(0,0,0), platformIndex(0,0,0), platformThumb(0,0,0), singleMarker, upperPinMarker(0,0,0), lowerPinMarker(0,0,0);
 vector <Marker> markers;
-static double interoculardistance=60.5;
+static double interoculardistance=0;
 bool headCalibration=false;
 /********* VISIBILITY VARIABLES ************************/
-bool allVisibleHead=false;
-bool allVisiblePatch=false;
-bool allVisibleIndex=false;
-bool allVisibleThumb=false;
-bool allVisibleFingers=false;
-bool allVisibleWrist=false;
-bool allVisiblePlatform1=false;
-bool allVisiblePlatform2=false;
-bool allVisiblePlatform3=false;
+#ifdef SIMULATION
+	bool markers_status = true;
+#else
+	bool markers_status = false;
+#endif
+
+bool allVisiblePatch=markers_status;
+bool allVisibleIndex=markers_status;
+bool allVisibleThumb=markers_status;
+bool allVisibleFingers=markers_status;
+bool allVisibleObject=markers_status;
+
 bool visibleInfo=true;
-bool visibleFingers=false;
+
 /********* STREAMS *************************************/
 ofstream responseFile, trialFile;
 
@@ -166,10 +192,7 @@ ofstream responseFile, trialFile;
 /*************************************************************************************/
 
 /********* VARIABLES THAT CHANGE IN EACH EXPERIMENT *************************/
-
-// Graphics modes
-static const bool gameMode = true;
-static const bool stereo = true;
+string experiment_directory;
 
 // centercal is typically used as a reference point for moving the motors.
 // It should correspond to the starting position (after homeEverything) of the point of interest.
@@ -184,35 +207,19 @@ double start_frame = 0;
 double num_lost_frames = 0; // needs to be a double for division
 int fingersOccluded = 0;
 int attempt = 1;
-double perceptual_estimate;
 double maxTime; // for duration
 
 // Flags for important states in the experiment
 bool training = true;
-int estimate_given = 0;
 bool handAtStart = true;
 bool started = false;
 bool reachedObject = false;
 bool finished = false;
 bool showFingers = true;
 
-/* Trial modes can be used to create variation outside of parameters
-const int CLOSED = 2;
-const int OPEN = 1
-const int BLIND = 0
-int visualConditions[3] = {BLIND OPEN CLOSED};
-const int EBB = 2;
-const int PON = 1
-const int MUL = 0
-int illusions[3] = {MUL PON EBB};
-*/
-
-const int num_blocks = 3;
+const int num_blocks = 5;
 int block = 0;
 vector<int> block_order;
-
-//bool burn_in = true;
-//int burn_count = 1;
 
 // Experimental variables
 //ParametersLoader parameters; //from parameters file
@@ -221,13 +228,10 @@ ParametersLoader parameters[num_blocks]; //from parameters file
 BalanceFactor<double> trial[num_blocks]; //constructed based on parameters file
 map <std::string, double> factors; //each trial contains a factors list
 
-// Boundaries of the starting position
-double startPosTop;
-double startPosFront;
-double startPosRight;
-double startPosLeft;
-double startPosRear;
-double startPosBottom;
+// The starting position
+double startPosX;
+double startPosY;
+double startPosZ;
 double x_dist_home;
 double y_dist_home;
 double z_dist_home;
@@ -251,32 +255,11 @@ double targetOriginX;
 double targetOriginY;
 double targetOriginZ;
 
-//double hapticSize = 40;
-//double visualSize = 40;
-//double objDepth = 10;
-//double objWidth = 10;
-
-//double leftObjX;
-//double leftObjY;
-//double leftObjZ;
-//double rightObjX;
-//double rightObjY;
-//double rightObjZ;
-
-int groupNum;
-int posnSequence[20];
-int posnSequence1[20]={1,0,0,1,1,1,0,0,1,0,1,0,1,1,0,0,1,1,0,0};
-int posnSequence2[20]={1,1,0,1,0,0,1,1,0,1,1,0,0,1,0,1,1,0,0,0};
-int posnSequence3[20]={0,1,1,0,1,1,0,0,1,0,0,1,0,0,1,1,0,0,1,1};
-int posnSequence4[20]={0,0,1,0,0,0,1,1,0,1,0,1,1,0,1,0,0,1,1,1};
-int posnSequence5[20]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-int posnSequence6[20]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
 // Incremented when stepping thru calibration procedure
 // Make sure that drawInfo() and handleKeypress() are in agreement about this variable!
-
-int fingerCalibration = 0;
+int fingerCalibrationDone = 0;
 bool triangulate = true;
+
 /********** FUNCTION PROTOTYPES *****/
 void advanceTrial();
 void beepOk(int tone);
@@ -300,9 +283,15 @@ void initRendering();
 void initStreams();
 void initTrial();
 void initVariables();
-void LoadGLTextures();
+//void LoadGLTextures();
 void onMouseClick(int button, int state, int x, int y);
 void update(int value);
+void updateTheMarkers();
+
+// online operations
+void online_apparatus_alignment();
+void online_fingers();
+void online_trial();
 
 /*************************** FUNCTIONS ***********************************/
 
@@ -322,29 +311,32 @@ void initStreams()
 	{
 		ifstream parametersFile;
 		int jj = ii+1;
-		string paramFn = "C:/workspace/cncsvisioncmake/experimentsbrown/parameters/evanMoreIllusions/parametersEvanMoreIllusions"+stringify<int>(jj)+".txt";
+		#ifndef SIMULATION
+			string paramFn = "S:/Domini-ShapeLab/evan/summer15-moreIllusions/parametersEvanMoreIllusions"+stringify<int>(jj)+".txt";
+		#else
+			string paramFn = "/media/shapelab/Domini-ShapeLab/evan/summer15-moreIllusions/parametersEvanMoreIllusions"+stringify<int>(jj)+".txt";
+		#endif
 		parametersFile.open(paramFn.c_str());
 		parameters[ii].loadParameterFile(parametersFile);
 	}
 	// Subject name - only needs to be set in the **Block 1** parameters file
     string subjectName = parameters[0].find("SubjectName");
 
+    // experiment directory
+	#ifndef SIMULATION
+		experiment_directory = "S:/Domini-ShapeLab/evan/summer15-moreIllusions/";
+	#else
+		experiment_directory = "/media/shapelab/Domini-ShapeLab/evan/summer15-moreIllusions/";
+	#endif
+
 	// Markersfile directory
-	string dirName  = "S:/Domini-ShapeLab/evan/summer15-moreIllusions/" + subjectName;
-	mkdir(dirName.c_str());
+	string dirName  = experiment_directory + subjectName;
+	#ifdef SIMULATION
+		mkdir(dirName.c_str(), 777); // linux syntax
+	#else
+		mkdir(dirName.c_str()); // windows syntax
+	#endif
 
-	// Principal streams file
-	string responseFileName = "S:/Domini-ShapeLab/evan/summer15-moreIllusions/" + subjectName + "/exp01_" + subjectName + ".txt";
-
-	// Check for output file existence 
-	/// Response file
-	if ( !fileExists((responseFileName)) ) {
-        responseFile.open((responseFileName).c_str());
-	} else {
-		exit(0);
-	}
-
-	responseFile << fixed << "subjName\tblock\tillusion\tobjID\ttrialN\ttrialDuration\tobjectSize\tperceptualEstimate\topenloop\ttrainingMode" << endl;
 	globalTimer.start();
 }
 
@@ -356,13 +348,7 @@ void handleKeypress(unsigned char key, int x, int y)
 
 	case ' ':
 	{
-		if (allVisibleFingers){
-			perceptual_estimate=grip_aperture;
-			estimate_given=1;
-			beepOk(9);
-		}
-		else
-			beepOk(12);
+		
 	}
 	break;
 
@@ -381,32 +367,33 @@ void handleKeypress(unsigned char key, int x, int y)
 
 	case 'm':
 	{
-		interoculardistance += 0.5;
-		headEyeCoords.setInterOcularDistance(interoculardistance);
+		//interoculardistance += 0.5;
+		//headEyeCoords.setInterOcularDistance(interoculardistance);
 	}
 	break;
 	
 	case 'n':
 	{
-		interoculardistance -= 0.5;
-		headEyeCoords.setInterOcularDistance(interoculardistance);
+		//interoculardistance -= 0.5;
+		//headEyeCoords.setInterOcularDistance(interoculardistance);
 	}
 
 	case '*':
 	{
-		illusionID += 1;
-		illusionID = illusionID%2;
+		illusion += 1;
+		illusion = illusion%3;
 	}
 	break;
 
 	case 'r':
 	{
-		beepOk(objId+7);
+		
 	}
 	break;
 
     case 27:	// ESC
     {   
+    	stepper_close(rotTable);
 		cleanup();
         exit(0);
     }
@@ -417,63 +404,31 @@ void handleKeypress(unsigned char key, int x, int y)
 	{
 		// calibration_fingers handles step 1 with the block
         
-		if ( fingerCalibration==2 && allVisibleFingers && allVisiblePlatform3 )
+		if ( fingerCalibrationDone==2 && allVisibleFingers &&  allVisibleObject )
 		{
 			// set index and thumb tips
 			calibration_fingers(3);
-			fingerCalibration=3;
+			fingerCalibrationDone=3;
 			beepOk(0);
 			break;
 		}
-		if ( fingerCalibration==3 && allVisibleFingers )
+		if ( fingerCalibrationDone==3 && allVisibleFingers )
 		{
 			// set start posn
-			startPosLeft = index.x() - 20;
-			startPosRight = index.x() + 20;
-			startPosBottom = index.y() - 20;
-			startPosTop = index.y() + 20;
-			startPosFront = index.z() - 20;
-			startPosRear = index.z() + 20;
-			fingerCalibration=6;
+			startPosX = ind.x();
+			startPosY = ind.y();
+			startPosZ = ind.z();
+			fingerCalibrationDone=4;
 			beepOk(0);
 			break;
 		}
-		/*if ( fingerCalibration==4 && allVisibleFingers )
-		{
-			// set left obj position (origin for drawing isn't center...)
-            
-            //leftObjX = index.x();
-			//leftObjY = index.y();
-			//leftObjZ = index.z();
-            
-            cylL_x = index.x(); // leftObjX - cylRad/2;
-            cylL_y = index.y(); // leftObjY + cylHeight/2;
-            cylL_z = displayDepth; //leftObjZ - cylRad/2;
-
-            fingerCalibration=5;
-			beepOk(0);
-			break;
-		}
-		if ( fingerCalibration==5 && allVisibleFingers )
-		{
-			// set right obj position (origin for drawing isn't center...)
-			cylR_x = index.x();
-			cylR_y = index.y();
-			cylR_z = displayDepth;
-			//cylR_x = rightObjX - cylRad/2;
-			//cylR_y = rightObjY + cylHeight/2;
-			//cylR_z = rightObjZ - cylRad/2;
-			fingerCalibration=6;
-			beepOk(0);
-			break;
-		}*/
-		if ( fingerCalibration==6 && allVisibleFingers )
+		
+		if ( fingerCalibrationDone==4 && allVisibleFingers )
 		{
 			// start experiment
-			fingerCalibration=7;
+			fingerCalibrationDone=5;
 			beepOk(0);
 			visibleInfo=false;
-			//factors = trial.getNext();
 			factors = trial[block_order[block]].getNext();
 			initTrial();
 		}
@@ -485,8 +440,6 @@ void handleKeypress(unsigned char key, int x, int y)
 		break;
 
 	case 't':
-		if(training)
-			block++;
 		training=false;
 		beepOk(0);
 		// Close the trial file
@@ -495,116 +448,106 @@ void handleKeypress(unsigned char key, int x, int y)
 		initTrial();
 		break;
 
-	case '1':
-		cylR_x -= 1.0;
-		break;
-	case '3':
-		cylR_x += 1.0;
-		break;
-	case '2':
-		cylR_y -= 1.0;
-		break;
-	case '5':
-		cylR_y += 1.0;
-		break;
-	case '4':
-		cylR_z += 1.0;
-		break;
-	case '6':
-		cylR_z -= 1.0;
-		break;
-    case '7':
-        cylR_pitch -= 1.0;
-        break;
-    case '9':
-        cylR_pitch += 1.0;
-        break;
+	// case '1':
+	// 	cylR_x -= 1.0;
+	// 	break;
+	// case '3':
+	// 	cylR_x += 1.0;
+	// 	break;
+	// case '2':
+	// 	cylR_y -= 1.0;
+	// 	break;
+	// case '5':
+	// 	cylR_y += 1.0;
+	// 	break;
+	// case '4':
+	// 	cylR_z += 1.0;
+	// 	break;
+	// case '6':
+	// 	cylR_z -= 1.0;
+	// 	break;
+ //    case '7':
+ //        cylR_pitch -= 1.0;
+ //        break;
+ //    case '9':
+ //        cylR_pitch += 1.0;
+ //        break;
 
 	case 'a':
-		cylL_x -= 1.0;
+		cyl_x -= 1.0;
 		break;
 	case 'd':
-		cylL_x += 1.0;
+		cyl_x += 1.0;
 		break;
 	case 's':
-		cylL_y -= 1.0;
+		cyl_y -= 1.0;
 		break;
 	case 'w':
-		cylL_y += 1.0;
+		cyl_y += 1.0;
 		break;
 	case 'e':
-		cylL_z += 1.0;
+		cyl_z += 1.0;
 		break;
 	case 'q':
-		cylL_z -= 1.0;
+		cyl_z -= 1.0;
 		break;
     case 'z':
-        cylL_pitch -= 1.0;
+        cyl_pitch -= 1.0;
         break;
     case 'c':
-        cylL_pitch += 1.0;
+        cyl_pitch += 1.0;
         break;
 
-	case 'o':
-		openloop = !openloop;
-		break;
+	// case 'o':
+	// 	openloop = !openloop;
+	// 	break;
 	}
-
 }
 
 void onMouseClick(int button, int state, int x, int y)
 {
   if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) 
   { 
-     //store the x,y value where the click happened
-     handAtStart=true;
+     
   }	
   if (button == GLUT_LEFT_BUTTON && state == GLUT_UP)
   {
-	  handAtStart=false;
+	  
   }
-  if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN){
-	  if (allVisibleFingers){
-		  perceptual_estimate=grip_aperture;
-		  estimate_given=1;
-		  beepOk(9);
-	  }
-	  else
-		  beepOk(12);
+  if (button == GLUT_RIGHT_BUTTON && state == GLUT_DOWN)
+  {
+	 
   }
 }
 
+/*** GRASP ***/
 void calibration_fingers(int phase)
 {
 	switch (phase)
 	{
 		case 1:
 		{
-			if(allVisiblePlatform1)
+			if(allVisibleObject)
 			{
-				upperPinMarker = markers[1].p;
-				upperPin.init(upperPinMarker, markers.at(8).p, markers.at(11).p, markers.at(12).p );
+				upperPinMarker=markers.at(calibration1).p;
+				upperPin.init(upperPinMarker, markers.at(calibrationobj1).p, markers.at(calibrationobj2).p, markers.at(calibrationobj3).p );
 			}
 		} break;
 		case 2:
 		{
-			if(allVisiblePlatform2)
+			if(allVisibleObject)
 			{
-				lowerPinMarker=markers[2].p;
-				lowerPin.init(lowerPinMarker, markers.at(8).p, markers.at(11).p, markers.at(12).p );
+				lowerPinMarker=markers.at(calibration2).p;
+				lowerPin.init(lowerPinMarker, markers.at(calibrationobj1).p, markers.at(calibrationobj2).p, markers.at(calibrationobj3).p );
 			}
 		} break;
 		case 3:
 		{
-			if(allVisiblePlatform3 && allVisibleFingers)
-			{
-				indexCoords.init(upperPin.getP1(), markers.at(13).p, markers.at(14).p, markers.at(16).p );
-				thumbCoords.init(lowerPin.getP1(), markers.at(15).p, markers.at(17).p, markers.at(18).p );
-			}
+			indexCoords.init(upperPin.getP1(), markers.at(ind1).p, markers.at(ind2).p, markers.at(ind3).p );
+			thumbCoords.init(lowerPin.getP1(), markers.at(thu1).p, markers.at(thu2).p, markers.at(thu3).p );
 		} break;
 	}
 }
-
 
 // Provide text instructions for calibration, as well as information about status of experiment
 void drawInfo()
@@ -629,7 +572,7 @@ void drawInfo()
 			text.draw("The experiment is over. Thank you! :)");
 		}else{
 
-			switch (fingerCalibration)
+			switch (fingerCalibrationDone)
 			{
 			case 0:
 				text.draw("Expose three and upper pin");
@@ -644,15 +587,9 @@ void drawInfo()
 				text.draw("Place hand in start position, then press F");
 				break;
 			case 4:
-				text.draw("Touch the position of the left object with your index finger, then press F");
-				break;
-			case 5:
-				text.draw("Touch the position of the right object with your index finger, then press F");
-				break;
-			case 6:
 				text.draw("Press F to begin!");
 				break;
-			} // end switch(fingerCalibration)
+			} // end switch(fingerCalibrationDone)
 
             /////// Header ////////
 			text.draw("####### ####### #######");
@@ -683,11 +620,11 @@ void drawInfo()
             /////// Finger Calibration ////////
 			glColor3fv(glWhite);
 			text.draw("#######################");
-			text.draw("Calibration Step= " + stringify<int>(fingerCalibration) );
+			text.draw("Calibration Step= " + stringify<int>(fingerCalibrationDone) );
 
 			glColor3fv(glWhite);
-			text.draw("Calibration Platform" );
-			if ( allVisiblePlatform3 )
+			text.draw("Calibration Object" );
+			if ( allVisibleObject )
 				glColor3fv(glGreen);
 			else
 				glColor3fv(glRed);
@@ -710,7 +647,7 @@ void drawInfo()
 			
             /////// Only displayed during calibration ////////
             glColor3fv(glWhite);
-			if (fingerCalibration!=7){
+			if (fingerCalibrationDone!=5){
 
 				glColor3fv(glWhite);
 				text.draw(" " );
@@ -748,12 +685,12 @@ void drawInfo()
 				glColor3fv(glGreen);
 			else
 				glColor3fv(glRed);
-			text.draw("Index= " +stringify< Eigen::Matrix<double,1,3> >(index.transpose()));
+			text.draw("Index= " +stringify< Eigen::Matrix<double,1,3> >(ind.transpose()));
 			if (allVisibleThumb)
 				glColor3fv(glGreen);
 			else
 				glColor3fv(glRed);
-			text.draw("Thumb= " +stringify< Eigen::Matrix<double,1,3> >(thumb.transpose()));
+			text.draw("Thumb= " +stringify< Eigen::Matrix<double,1,3> >(thm.transpose()));
 			glColor3fv(glWhite);
 			text.draw("--------------------");
             
@@ -788,32 +725,35 @@ void drawInfo()
 	}
 }
 
-void LoadGLTextures()
-{
-	// load image files directly as new OpenGL textures
-	texture[0] = SOIL_load_OGL_texture("SOIL_textures/PonzoDisplayFinal.png",
-		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
-	//Typical texture generation using data from the bitmap
-	glBindTexture(GL_TEXTURE_2D,texture[0]);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+// void LoadGLTextures()
+// {
+// 	// load image files directly as new OpenGL textures
+// 	texture[0] = SOIL_load_OGL_texture("SOIL_textures/PonzoDisplayFinal.png",
+// 		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+// 	//Typical texture generation using data from the bitmap
+// 	glBindTexture(GL_TEXTURE_2D,texture[0]);
+// 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+// 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 
-	if (texture[0]==0)
-		beepOk(3);
+// 	if (texture[0]==0)
+// 		beepOk(3);
 
-	texture[1] = SOIL_load_OGL_texture("SOIL_textures/MullerLyerDisplayFinal.png",
-		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
-	//Typical texture generation using data from the bitmap
-	glBindTexture(GL_TEXTURE_2D,texture[1]);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-
-}
+// 	texture[1] = SOIL_load_OGL_texture("SOIL_textures/MullerLyerDisplayFinal.png",
+// 		SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+// 	//Typical texture generation using data from the bitmap
+// 	glBindTexture(GL_TEXTURE_2D,texture[1]);
+// 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+// 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+// }
 
 // This will be called at 85hz in the main loop
 // Not too much to change here usually, sub-functions do the work.
 void drawGLScene() 
 {
+	online_apparatus_alignment();
+	online_fingers();
+	online_trial();
+
 	if (stereo)
     {   glDrawBuffer(GL_BACK);
 		// Draw left eye view
@@ -843,14 +783,15 @@ void drawGLScene()
 		drawInfo();
         glutSwapBuffers();
     }
-
 }
 
 // Can check for various conditions that might affect how the graphics in here
 void drawStimulus()
 {
+	if (frameN==100)
+		beepOk(2);
 	// don't draw stimulus until calibration is over & not finished & motors have moved
-	if (fingerCalibration>3 && !finished && frameN>0) 
+	if (fingerCalibrationDone>3 && !finished && frameN>100) 
 	{
 		if(!(openloop && !handAtStart && started))
 			drawTrial();
@@ -859,28 +800,51 @@ void drawStimulus()
 	}
 }
 
-
 // this draws the actual stimulus
 void drawTrial()
 {
     drawCylinder(0); //left cylinder
-    drawCylinder(1); //right cylinder
+    //drawCylinder(1); //right cylinder
+
+    int verticalDistance = 100;
+    int horizontalDistance = 180;
+    double planeAngle=0;
     
-	// draw background
-	glEnable(GL_TEXTURE_2D); // enable texture mapping
+    // control background
+    if(illusion==1){
+    	planeAngle = 67;
+    	horizontalDistance = 450;
+    }else if(illusion==2){
+    	planeAngle = -67;
+    	horizontalDistance = 450;
+    }
+
 	glPushMatrix();
-    glTranslated(0,0,displayDepth);
-    glRotated(0,1,0,0);
-	glBindTexture(GL_TEXTURE_2D, texture[illusionID]);
-    glNormal3f(0.0f, 0.0f, 1.0f);                  // Normal Pointing toward screen
-	glBegin(GL_QUADS);
-		glTexCoord2f(0,0); glVertex3f(displayLeft, displayTop, 0.0f);         // Top Left
-		glTexCoord2f(1,0); glVertex3f(displayRight, displayTop, 0.0f);			// Top Right
-		glTexCoord2f(1,1); glVertex3f(displayRight,  displayBottom, 0.0f);		// Bottom Right
-		glTexCoord2f(0,1); glVertex3f(displayLeft,  displayBottom, 0.0f);		// Bottom Left
+	glLoadIdentity();
+	glTranslated(0,0,-500);
+	glRotated(planeAngle,0,1,0);
+	if(illusion==1){
+		glTranslated(75,0,0);
+	}else if(illusion==2){
+		glTranslated(-75,0,0);
+	}
+	glBegin(GL_LINE_LOOP);
+	glVertex3f((-horizontalDistance/2),verticalDistance/2,0);
+	glVertex3f((horizontalDistance/2),verticalDistance/2,0);
 	glEnd();
-	glDisable(GL_TEXTURE_2D);
+	glBegin(GL_LINE_LOOP);
+	glVertex3f((-horizontalDistance/2),-verticalDistance/2,0);
+	glVertex3f((horizontalDistance/2),-verticalDistance/2,0);
+	glEnd();
+	double spacing = horizontalDistance/9;
+	for(int i=0;i<10;i++){
+		glBegin(GL_LINE_LOOP);
+		glVertex3f((-horizontalDistance/2)+(i*spacing),verticalDistance/2,0);
+		glVertex3f((-horizontalDistance/2)+(i*spacing),-verticalDistance/2,0);
+		glEnd();
+	}
 	glPopMatrix();
+
 }
 
 // draw a cylinder
@@ -894,68 +858,59 @@ void drawCylinder(int cylID)
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, LightAmbient);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, LightDiffuse);
-	if(cylID==0){
-		glTranslated(cylL_x, cylL_y, cylL_z);
-		glRotated(cylL_pitch,1,0,0);
-	}
-	if(cylID==1){
-		glTranslated(cylR_x, cylR_y, cylR_z);
-		glRotated(cylR_pitch,1,0,0);
-	}
+	glTranslated(cyl_x, cyl_y, cyl_z);
+	glRotated(cyl_pitch,1,0,0);
 
 	// Cylinder
 	GLUquadricObj *cyl1;
 	cyl1 = gluNewQuadric();
 	gluQuadricDrawStyle(cyl1, GLU_LINE);
-	gluCylinder(cyl1, cylRad, cylRad, cylHeight, 4, 1);
+	gluCylinder(cyl1, cylRad, cylRad, cylHeight, 16, 1);
 	// The object should change color to indicate that it's been "reached"
-	if (!reachedObject && objId==cylID) {
+	if (!reachedObject) {
 		glColor3f(0.7f, 0.0f, 0.2f);
 	} else {
 		glColor3f(0.0f, 0.2f, 0.7f);
 	}
 	gluQuadricDrawStyle(cyl1, GLU_FILL);
 	gluQuadricNormals(cyl1, GLU_SMOOTH);
-	gluCylinder(cyl1, cylRad, cylRad, cylHeight, 4, 1);
+	gluCylinder(cyl1, cylRad, cylRad, cylHeight, 16, 1);
 	// End-disk 1
 	gluQuadricOrientation(cyl1, GLU_INSIDE);
 	glTranslated(0.0, 0.0, 0.0);
-	gluDisk(cyl1,0,cylRad,4,1);
+	gluDisk(cyl1,0,cylRad,16,1);
 	// End-disk 2
 	gluQuadricOrientation(cyl1, GLU_OUTSIDE);
 	glTranslated(0.0, 0.0, cylHeight);
-	gluDisk(cyl1,0,cylRad,4,1);
+	gluDisk(cyl1,0,cylRad,16,1);
 
 	glPopMatrix();
 
 	glColor3f(1.0f, 1.0f, 1.0f);
-
 }
-
 
 // this draws the fingertip points
 void drawFingers(double offsetZ)
 {
 	// Compute distance in the sagittal plane (assuming object is at (x,z)=(0,objDepth))
-	//double indexObjectDistance = sqrt( pow(index.x(), 2) 
-	//	+ pow( index.z() - objDepth , 2) );
-	//double thumbObjectDistance = sqrt( pow(thumb.x(), 2) 
-	//	+ pow( thumb.z() - objDepth , 2) );
+	//double indexObjectDistance = sqrt( pow(ind.x(), 2) 
+	//	+ pow( ind.z() - objDepth , 2) );
+	//double thumbObjectDistance = sqrt( pow(thm.x(), 2) 
+	//	+ pow( thm.z() - objDepth , 2) );
 	
 	glPushMatrix();
 	glLoadIdentity();
-	glTranslated(index.x(),index.y(),index.z());
+	glTranslated(ind.x(),ind.y(),ind.z());
 	glColor3fv(glRed);
 	glutSolidSphere(1,10,10);
 	glPopMatrix();
 	
 	glPushMatrix();
 	glLoadIdentity();
-	glTranslated(thumb.x(),thumb.y(),thumb.z());
+	glTranslated(thm.x(),thm.y(),thm.z());
 	glColor3fv(glRed);
 	glutSolidSphere(1,10,10);
 	glPopMatrix();
-	
 }
 
 // called at the beginning of every trial
@@ -966,57 +921,77 @@ void initTrial()
 	TGA_frame = 0;
 	start_frame = 0;
 	started = false;
-	//handAtStart = true;
 	reachedObject = false;
 	fingersOccluded = 0;
 	num_lost_frames = 0;
-	estimate_given = 0;
 
-	// roll on
-	drawGLScene();
+	// Get current trial info
+	illusion = trial[block_order[block]].getCurrent()["illusion"];
+	int objSize = trial[block_order[block]].getCurrent()["objSize"];
+
+	if(illusion==0){ // CONTROL
+		if(objSize==1){
+			cylHeight=38;
+			objId=2;
+		}else if(objSize==2){
+			cylHeight=40;
+			objId=5;
+		}else if(objSize==3){
+			cylHeight=42;
+			objId=8;
+		}
+	}else if(illusion==1){ // REDUCE
+		if(objSize==1){
+			cylHeight=39;
+			objId=3;
+		}else if(objSize==2){
+			cylHeight=41;
+			objId=6;
+		}else if(objSize==3){
+			cylHeight=43;
+			objId=9;
+		}
+	}else if(illusion==2){ // EXPAND
+		if(objSize==1){
+			cylHeight=37;
+			objId=1;
+		}else if(objSize==2){
+			cylHeight=39;
+			objId=4;
+		}else if(objSize==3){
+			cylHeight=41;
+			objId=7;
+		}
+	}
+
+	if (training)
+		objId = (rand() % 9)+1;
+
 	// move the screen
 	initProjectionScreen(displayDepth);
 
-	objId = posnSequence[trialNumber];
-
-	if (training)
-		if (groupNum<5)
-			objId = rand() % 2;
-		else
-			objId = 1;
+	// set the phidgets
+	stepper_rotate(rotTable, (objId-1) * 30.0 / M_PI);
+	//phidgets_linear_move(objside-30.0, axisZ);
 
 	// Find center of physical haptic stimulus
-	if (objId==0){
-        targetOriginX = cylL_x;
-        targetOriginY = cylL_y-cylHeight/2;
-        targetOriginZ = cylL_z-cylRad/2;
-	} else if (objId==1) {
-		targetOriginX = cylR_x;
-		targetOriginY = cylR_y-cylHeight/2;
-        targetOriginZ = cylR_z-cylRad/2;
-	}
+    targetOriginX = cyl_x;
+    targetOriginY = cyl_y-cylHeight/2;
+    targetOriginZ = cyl_z-cylRad/2;
 
 	// Open a new trial file and give it a header
 	string trialFileName;
 	if (!training){
-		trialFileName = "S:/Domini-ShapeLab/evan/summer15-moreIllusions/" + parameters[0].find("SubjectName") + "/" + parameters[0].find("SubjectName") + "_block" + stringify<double>(block) + "_trial" + stringify<double>(trialNumber) + ".txt";
+		trialFileName = experiment_directory + parameters[0].find("SubjectName") + "/" + parameters[0].find("SubjectName") + "_block" + stringify<double>(block) + "_trial" + stringify<double>(trialNumber) + ".txt";
 	}else{
-		trialFileName = "S:/Domini-ShapeLab/evan/summer15-moreIllusions/" + parameters[0].find("SubjectName") + "/" + parameters[0].find("SubjectName") +"_training" + stringify<double>(trainTrialNumber) + ".txt";
+		trialFileName = experiment_directory + parameters[0].find("SubjectName") + "/" + parameters[0].find("SubjectName") +"_training" + stringify<double>(trainTrialNumber) + ".txt";
 	}
 	
 	trialFile.open(trialFileName.c_str());
-	trialFile << fixed << "subjName\ttrialN\ttime\tframeN\tindexXYZraw\tthumbXYZraw\tdistanceToObject\tfingersOccluded\treachedObject" << endl;
+	trialFile << fixed << "subjName\tblockN\ttrialN\tobjId\tobjHeight\tillusion\ttime\tframeN\tindexXraw\tindexYraw\tindexZraw\tthumbXraw\tthumbYraw\tthumbZraw\tdistanceToObject\tfingersOccluded\treachedObject" << endl;
 
-	//if (groupNum<5)
-	
-	beepOk(objId+7);
-	
-	/*else {
-		if (trialNumber==10)
-			beepOk(1);
-		else
-			beepOk(2);
-	}*/
+	// roll on
+	drawGLScene();
 
 	timer.start();
 }
@@ -1033,6 +1008,7 @@ void advanceTrial()
 	//cout << num_lost_frames << " " << TGA_frame << " " << start_frame << " " << percent_occluded_frames << endl;
 	bool bad_start = start_dist > 40;
 
+	#ifndef SIMULATION
 	// Check whether there is some reason to reinsert
 	if ( !reachedObject || not_enough_frames || bad_start ) {
 		beepOk(3);
@@ -1053,34 +1029,19 @@ void advanceTrial()
 		//map<std::string,double> currentFactorsList = trial[block_order[block]].getCurrent();
 		//trial[block_order[block]].reinsert(currentFactorsList);
 		overwrite = 1;
-	} else if (training){
+	}
+	#endif
+
+	 if (training){
 		overwrite=1;
 		trainTrialNumber++;
 		cout << "Training Mode!" << endl;
 	}
 
-
-	// If we're not reinserting, write trial-specific data to response file
-	if (!overwrite || training)
-	{
-		responseFile.precision(3);
-		responseFile << parameters[0].find("SubjectName") << "\t" <<
-						block << "\t" <<
-						illusionID << "\t" <<
-						objId << "\t" <<
-						trialNumber << "\t" <<
-						maxTime << "\t" <<
-						cylHeight << "\t" <<
-						perceptual_estimate << "\t" <<
-						openloop << "\t" <<
-						training <<
-						endl;
-	}
 	// Close the trial file
 	trialFile.close();
 
-	// If there are more trials in the current block
-	//if( trialNumber<20 ) {
+	// If there are more trials in the current block (block is not empty)
 	if( !trial[block_order[block]].isEmpty() ) {
 		// If we're not overwriting due to a bad trial
 		if (!overwrite){
@@ -1100,8 +1061,6 @@ void advanceTrial()
 	// Otherwise we need to advance block
 	} else {
 		block++;
-		if (block==2)
-			illusionID++;
 		trialNumber=0;
 		//newBlock=true;
 		factors = trial[block_order[block]].getNext();
@@ -1109,114 +1068,144 @@ void advanceTrial()
 	}
 }
 
-
 void idle()
 {
 	// get new marker positions from optotrak
-	optotrak->updateMarkers();
-	markers = optotrak->getAllMarkers();
+	updateTheMarkers();
 
-	// check visibility
-	if (triangulate){
-		allVisiblePlatform3 = isVisible(markers[8].p) && isVisible(markers[11].p) && isVisible(markers[12].p);
-		allVisiblePlatform1 = isVisible(markers[1].p) && allVisiblePlatform3;
-		allVisiblePlatform2 = isVisible(markers[2].p) && allVisiblePlatform3;
-		allVisibleIndex = isVisible(markers[13].p) && isVisible(markers[14].p) && isVisible(markers[16].p);
-		allVisibleThumb = isVisible(markers[15].p) && isVisible(markers[17].p) && isVisible(markers[18].p);
-		allVisibleFingers = allVisibleIndex && allVisibleThumb;// && allVisibleWrist;
-		allVisiblePatch = isVisible(markers[5].p) && isVisible(markers[6].p) && isVisible(markers[7].p);
-		allVisibleHead = allVisiblePatch && isVisible(markers[1].p);
-	} else {
-		allVisibleIndex = isVisible(markers[9].p);
-		allVisibleThumb = isVisible(markers[10].p);
-		allVisibleFingers = allVisibleThumb && allVisibleIndex;
-		allVisibleWrist = isVisible(markers[22].p);
+	// eye coordinates
+	eyeRight = Vector3d(0.0/2,0,0);
+	eyeLeft = Vector3d(-0.0/2,0,0);
+
+	// Write to trialFile once calibration is over
+	
+	if (fingerCalibrationDone==5)
+	{
+		trialFile << fixed <<
+		//parameters.find("SubjectName") << "\t" <<	//subjName
+		parameters[0].find("SubjectName") << "\t" <<	//subjName
+		block << "\t" <<								//blockN
+		trialNumber << "\t" <<							//trialN
+		objId << "\t" <<								//objId
+		cylHeight << "\t" <<							//objHeight
+		illusion << "\t" <<								//illusion
+		timer.getElapsedTimeInMilliSec() << "\t" <<		//time
+		frameN << "\t" <<								//frameN
+		ind.transpose() << "\t" <<						//indexXraw, indexYraw, indexZraw
+		thm.transpose() << "\t" <<						//thumbXraw, thumbYraw, thumbZraw
+		distanceGripCenterToObject << "\t" <<			//distanceToObject
+		fingersOccluded << "\t" <<						//fingersOccluded
+		reachedObject << endl;							//reachedObject
 	}
 
+	// conditions for trial advance
+	if(handAtStart && started)
+		advanceTrial();
+}
 
-	// check equipment alignments
+
+
+/*** Online operations ***/
+void online_apparatus_alignment()
+{
+	// mirror alignment check
 	mirrorAlignment = asin(
-			abs((markers[6].p.z()-markers[7].p.z()))/
+			abs((markers.at(mirror1).p.z()-markers.at(mirror2).p.z()))/
 			sqrt(
-			pow(markers[6].p.x()-markers[7].p.x(), 2) +
-			pow(markers[6].p.z()-markers[7].p.z(), 2)
+			pow(markers.at(mirror1).p.x()-markers.at(mirror2).p.x(), 2) +
+			pow(markers.at(mirror1).p.z()-markers.at(mirror2).p.z(), 2)
 			)
 			)*180/M_PI;
+
+	// phidgets alignment check
+	phidgetsAlignment = asin(
+			abs((markers.at(phidgets1).p.z()-markers.at(phidgets2).p.z()))/
+			sqrt(
+			pow(markers.at(phidgets1).p.x()-markers.at(phidgets2).p.x(), 2) +
+			pow(markers.at(phidgets1).p.z()-markers.at(phidgets2).p.z(), 2)
+			)
+			)*180/M_PI;
+
+	// screen Y alignment check
 	screenAlignmentY = asin(
-			abs((markers[19].p.y()-markers[21].p.y()))/
+			abs((markers.at(screen1).p.y()-markers.at(screen3).p.y()))/
 			sqrt(
-			pow(markers[19].p.x()-markers[21].p.x(), 2) +
-			pow(markers[19].p.y()-markers[21].p.y(), 2)
+			pow(markers.at(screen1).p.x()-markers.at(screen3).p.x(), 2) +
+			pow(markers.at(screen1).p.y()-markers.at(screen3).p.y(), 2)
 			)
 			)*180/M_PI;
+
+	// screen Z alignment check
 	screenAlignmentZ = asin(
-			abs(markers[19].p.z()-markers[20].p.z())/
+			abs(markers.at(screen1).p.z()-markers.at(screen2).p.z())/
 			sqrt(
-			pow(markers[19].p.x()-markers[20].p.x(), 2) +
-			pow(markers[19].p.z()-markers[20].p.z(), 2)
+			pow(markers.at(screen1).p.x()-markers.at(screen2).p.x(), 2) +
+			pow(markers.at(screen1).p.z()-markers.at(screen2).p.z(), 2)
 			)
 			)*180/M_PI*
-			abs(markers[19].p.x()-markers[20].p.x())/
-			(markers[19].p.x()-markers[20].p.x());
+			abs(markers.at(screen1).p.x()-markers.at(screen2).p.x())/
+			(markers.at(screen1).p.x()-markers.at(screen2).p.x());
+}
 
-	// update head coordinates
-	if ( allVisiblePatch )
-		headEyeCoords.update(markers[5].p,markers[6].p,markers[7].p);
+void online_fingers()
+{
+	// Visibility check
+	allVisibleIndex = isVisible(markers.at(ind1).p) && isVisible(markers.at(ind2).p) && isVisible(markers.at(ind3).p);
+	allVisibleThumb = isVisible(markers.at(thu1).p) && isVisible(markers.at(thu2).p) && isVisible(markers.at(thu3).p);
+	allVisibleFingers = allVisibleIndex && allVisibleThumb;
 
-	// update finger coordinates (but we don't really use these directly!)
-	if ( allVisibleFingers ) {
-		if(triangulate){
-			indexCoords.update(markers[13].p, markers[14].p, markers[16].p );
-			thumbCoords.update(markers[15].p, markers[17].p, markers[18].p );
-		}
-		//wristCoords = markers[wristMarkerNum].p;
-		fingersOccluded = 0;
-	}
-	if (triangulate){
-		if ( allVisiblePlatform1 && fingerCalibration==0 )
-			{
-				// get upper pin
-				calibration_fingers(1);
-				fingerCalibration=1;
-			}
-			if ( fingerCalibration==1 && allVisiblePlatform2 )
-			{
-				// get lower pin
-				calibration_fingers(2);
-				fingerCalibration=2;
-				beepOk(0);
-			}
-		if ( allVisiblePlatform3 && fingerCalibration<3 )
-		{
-			upperPin.update(markers[8].p, markers[11].p, markers[12].p );
-			lowerPin.update(markers[8].p, markers[11].p, markers[12].p );
-		}
+	allVisibleObject = isVisible(markers.at(calibrationobj1).p) && isVisible(markers.at(calibrationobj2).p) && isVisible(markers.at(calibrationobj3).p);
 
-		// update the finger position in the objects we actually use
-		if (allVisibleIndex)
-			index = indexCoords.getP1();
-		if (allVisibleThumb)
-			thumb = thumbCoords.getP1();
-	}
-	if (!triangulate){
-		if (fingerCalibration==0)
-			fingerCalibration=3;
-		index = markers[9].p;
-		thumb = markers[10].p;
-		wrist = markers[22].p;
+	// fingers coordinates, fingersOccluded and framesOccluded
+	if ( allVisibleFingers )
+	{
+		indexCoords.update(markers.at(ind1).p, markers.at(ind2).p, markers.at(ind3).p );
+		thumbCoords.update(markers.at(thu1).p, markers.at(thu2).p, markers.at(thu3).p );
 	}
 
+	// Record the calibration platform's position and home position
+	if ( isVisible(markers.at(calibration1).p) && allVisibleObject && fingerCalibrationDone==0 )
+	{
+		fingerCalibrationDone=1;
+		calibration_fingers(fingerCalibrationDone);
+	}
+
+	// Record the calibration platform's position and home position
+	if ( isVisible(markers.at(calibration2).p) && allVisibleObject && fingerCalibrationDone==1 )
+	{
+		fingerCalibrationDone=2;
+		calibration_fingers(fingerCalibrationDone);
+		beepOk(2);
+	}
+
+	if ( allVisibleObject && fingerCalibrationDone==2 )
+	{
+		upperPin.update(markers.at(calibrationobj1).p, markers.at(calibrationobj2).p, markers.at(calibrationobj3).p );
+		lowerPin.update(markers.at(calibrationobj1).p, markers.at(calibrationobj2).p, markers.at(calibrationobj3).p );
+	}
+
+	#ifndef SIMULATION
+	// index coordinates
+	if(allVisibleIndex)
+		ind = indexCoords.getP1();
+
+	// thumb coordinates
+	if(allVisibleThumb)
+		thm = thumbCoords.getP1();
+	#endif
+}
+
+void online_trial()
+{
 	//////////////////////////////////////
 	// While the experiment is running! //
 	//////////////////////////////////////
-	if (fingerCalibration==7 && !finished)
+	if (fingerCalibrationDone==5 && !finished)
 	{
 		// Check for finger occlusion
 		if ( !allVisibleFingers )
 		{
 			fingersOccluded = 1;
-			//if (!started)
-			//	beepOk(4);
 			if (started && !reachedObject) // only increment if we're in flight
 			{
 				num_lost_frames += 1;
@@ -1227,58 +1216,39 @@ void idle()
 		frameN++;
 
 		// find distance from grip center to object center
-		grip_Origin_X = (index.x()+thumb.x())/2;
-		grip_Origin_Y = (index.y()+thumb.y())/2;
-		grip_Origin_Z = (index.z()+thumb.z())/2;
+		grip_Origin_X = (ind.x()+thm.x())/2;
+		grip_Origin_Y = (ind.y()+thm.y())/2;
+		grip_Origin_Z = (ind.z()+thm.z())/2;
 		x_dist = abs(grip_Origin_X - targetOriginX);
 		y_dist = abs(grip_Origin_Y - targetOriginY);
 		z_dist = abs(grip_Origin_Z - targetOriginZ);
 		distanceGripCenterToObject = sqrt((x_dist*x_dist)+(y_dist*y_dist)+(z_dist*z_dist));
 
-		x_dist_home = abs(grip_Origin_X - (startPosLeft + startPosRight)/2);
-		y_dist_home = abs(grip_Origin_Y - (startPosTop + startPosBottom)/2);
-		z_dist_home = abs(grip_Origin_Z - (startPosFront + startPosRear)/2);
+		x_dist_home = abs(grip_Origin_X - startPosX);
+		y_dist_home = abs(grip_Origin_Y - startPosY);
+		z_dist_home = abs(grip_Origin_Z - startPosZ);
 		distanceGripCenterToHome = sqrt((x_dist_home*x_dist_home)+(y_dist_home*y_dist_home)+(z_dist_home*z_dist_home));
+		handAtStart = distanceGripCenterToHome<30;
 
 		// compute grip aperture
 		grip_aperture = sqrt(
-			(index.x() - thumb.x())*(index.x() - thumb.x()) + 
-			(index.y() - thumb.y())*(index.y() - thumb.y()) + 
-			(index.z() - thumb.z())*(index.z() - thumb.z())
+			(ind.x() - thm.x())*(ind.x() - thm.x()) + 
+			(ind.y() - thm.y())*(ind.y() - thm.y()) + 
+			(ind.z() - thm.z())*(ind.z() - thm.z())
 			);
 
-		/* Check that both fingers are in the start position
-		if( ( (index.y() < startPosTop) && // index below ceiling
-			  (index.y() > startPosBottom) && // index above floor
-			  (index.x() > startPosLeft) && // index right of left wall
-			  (index.x() < startPosRight) && // index left of right wall
-			  (index.z() > startPosFront) &&  // index behind front wall
-		      (index.z() < startPosRear) && // index in front of rear wall
-			  (thumb.y() < startPosTop) && // thumb below ceiling
-			  (index.y() > startPosBottom) && // thumb above floor
-			  (thumb.x() > startPosLeft) && // thumb right of left wall
-			  (thumb.x() < startPosRight) && // thumb left of right wall
-			  (thumb.z() > startPosFront) &&  // thumb behind front wall
-			  (thumb.z() < startPosRear) ) // thumb in front of rear wall
-			  || (estimate_given==0) )*/
-		if (handAtStart || (estimate_given==0))
+		// If we haven't started yet
+		if (handAtStart)
 		{	
-			// if we already gave the estimate and are returning to the start position
-			if (estimate_given==1){
-				estimate_given=2;
-				beepOk(10);
-			} 
 			// keep resetting timer
-			//handAtStart = true;
 			maxTime = timer.getElapsedTimeInMilliSec();
 			timer.start();
-		} else if (estimate_given==2) { 
+		} else {
 			// otherwise we are in flight, so set flags and let the timer run
 			if (start_frame==0){
 				start_frame=frameN;
 				start_dist = distanceGripCenterToHome;
 			}
-			//handAtStart = false;
 			started = true;
 		}
 
@@ -1292,38 +1262,10 @@ void idle()
 				TGA_frame = frameN;
 			}
 		}
-	}
 
-	// recompute the eye coordinates for drawing so we can change IOD online
-	if(headCalibration){
-		eyeLeft = headEyeCoords.getLeftEye();
-		eyeRight = headEyeCoords.getRightEye();
-	}else{
-		eyeRight = Vector3d(interoculardistance/2,0,0);
-		eyeLeft = -eyeRight;
 	}
-
-	// Write to trialFile once calibration is over
-	if (fingerCalibration==7 )
-	{
-		trialFile << fixed <<
-		//parameters.find("SubjectName") << "\t" <<	//subjName
-		parameters[0].find("SubjectName") << "\t" <<	//subjName
-		trialNumber << "\t" <<							//trialN
-		timer.getElapsedTimeInMilliSec() << "\t" <<		//time
-		frameN << "\t" <<								//frameN
-		index.transpose() << "\t" <<					//indexXraw, indexYraw, indexZraw
-		thumb.transpose() << "\t" <<					//thumbXraw, thumbYraw, thumbZraw
-		//wrist.transpose() << "\t" <<
-		distanceGripCenterToObject << "\t" <<			//distanceToObject
-		fingersOccluded << "\t" <<						//fingersOccluded
-		reachedObject << endl;							//reachedObject
-	}
-
-	// conditions for trial advance
-	if(handAtStart && started)
-		advanceTrial();
 }
+
 
 //////////////////////////////////
 // Some extra draw functions... //
@@ -1347,6 +1289,13 @@ void drawNoFingers()
 ///////////////////////////////////////////////////////////
 /////// USUALLY DON'T NEED TO EDIT THESE FUNCTIONS ////////
 ///////////////////////////////////////////////////////////
+
+
+void updateTheMarkers()
+{
+	optotrak.updateMarkers();
+	markers = optotrak.getAllMarkers();
+}
 
 // change the body of this one if we have multiple blocks filled with same parameters
 void initVariables() 
@@ -1411,7 +1360,7 @@ void initRendering()
 	//glEnable(GL_CULL_FACE);
 
 	// Load in the illusions as textures
-	LoadGLTextures(); 
+	//LoadGLTextures(); 
 
     /* Set depth function */
     glDepthFunc(GL_LEQUAL);
@@ -1442,83 +1391,79 @@ void initMotors()
 
 void initOptotrak()
 {
-    optotrak=new Optotrak2();
-    optotrak->setTranslation(calibration);
-    int numMarkers=22; // updated 9/29/14
-    float frameRate=85.0f;
-    float markerFreq=4600.0f;
-    float dutyCycle=0.4f;
-    float voltage = 7.0f;
-	if ( optotrak->init("C:/cncsvisiondata/camerafiles/Aligned20111014",numMarkers, frameRate, markerFreq, dutyCycle,voltage) != 0)
+    optotrak.setTranslation(calibration);
+
+    if ( optotrak.init(LastAlignedFile, OPTO_NUM_MARKERS, OPTO_FRAMERATE, OPTO_MARKER_FREQ, OPTO_DUTY_CYCLE,OPTO_VOLTAGE) != 0)
     {   cerr << "Something during Optotrak initialization failed, press ENTER to continue. A error log has been generated, look \"opto.err\" in this folder" << endl;
         cin.ignore(1E6,'\n');
         exit(0);
     }
+
     // Read 10 frames of coordinates and fill the markers vector
     for (int i=0; i<10; i++)
     {
-        optotrak->updateMarkers();
-        markers = optotrak->getAllMarkers();
+        updateTheMarkers();
     }
 }
 
 void cleanup()
 {
 	// Stop the optotrak
-    optotrak->stopCollection();
-    delete optotrak;
+	optotrak.stopCollection();
 }
 
 void beepOk(int tone)
 {
-	switch(tone)
-	{
-	case 0:
-    // Remember to put double slash \\ to specify directories!!!
-    PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-1.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 1:
-    PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\calibrate.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 2:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-8.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 3:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-reject.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 4:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-visibility.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 7:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-left.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 8:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-right.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 9:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-home.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 10:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-grasp.wav", 
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 11:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-marker.wav",
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	case 12:
-	PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-estimate.wav",
-		NULL, SND_FILENAME | SND_ASYNC);
-	break;
-	}
+	#ifndef SIMULATION
+		switch(tone)
+		{
+		case 0:
+	    // Remember to put double slash \\ to specify directories!!!
+	    PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-1.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 1:
+	    PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\calibrate.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 2:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-8.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 3:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-reject.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 4:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\beep-visibility.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 7:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-left.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 8:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-right.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 9:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-home.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 10:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-grasp.wav", 
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 11:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-marker.wav",
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		case 12:
+		PlaySound((LPCSTR) "C:\\cygwin\\home\\visionlab\\workspace\\cncsvision\\data\\beep\\spoken-estimate.wav",
+			NULL, SND_FILENAME | SND_ASYNC);
+		break;
+		}
+	#endif
 	return;
 }
 
@@ -1530,37 +1475,37 @@ int main(int argc, char*argv[])
 {
 	mathcommon::randomizeStart();
 
-	cout << "Please enter the subject's group number (1-4): " << endl;
-	cin >> groupNum;
+	// cout << "Please enter the subject's group number (1-4): " << endl;
+	// cin >> groupNum;
 
-	switch (groupNum){
-		case 1:
-			{
-				for (int n=0; n<20; n++)
-					posnSequence[n] = posnSequence1[n];
-			}
-			break;
-		case 2:
-			{
-				for (int n=0; n<20; n++)
-					posnSequence[n] = posnSequence2[n];
-			}
-			break;
-		case 3:
-			{
-				for (int n=0; n<20; n++)
-					posnSequence[n] = posnSequence3[n];
-			}
-			break;
-		case 4:
-			{
-				for (int n=0; n<20; n++)
-					posnSequence[n] = posnSequence4[n];
-			}
-			break;
-	}
+	// switch (groupNum){
+	// 	case 1:
+	// 		{
+	// 			for (int n=0; n<20; n++)
+	// 				posnSequence[n] = posnSequence1[n];
+	// 		}
+	// 		break;
+	// 	case 2:
+	// 		{
+	// 			for (int n=0; n<20; n++)
+	// 				posnSequence[n] = posnSequence2[n];
+	// 		}
+	// 		break;
+	// 	case 3:
+	// 		{
+	// 			for (int n=0; n<20; n++)
+	// 				posnSequence[n] = posnSequence3[n];
+	// 		}
+	// 		break;
+	// 	case 4:
+	// 		{
+	// 			for (int n=0; n<20; n++)
+	// 				posnSequence[n] = posnSequence4[n];
+	// 		}
+	// 		break;
+	// }
 
-	fingerCalibration=0;
+	fingerCalibrationDone=0;
 	
 	for (int i=0; i<num_blocks; ++i)
 		block_order.push_back(i);
@@ -1571,34 +1516,31 @@ int main(int argc, char*argv[])
     initMotors();
 	initOptotrak();
 
-	// push back the apparatus
-	Vector3d object_reset_position(0,0,0);
-	object_reset_position = markers[3].p.transpose();
-	// calculate where the object has to go
-	Vector3d object_position(0.0,object_reset_position.y(),-800);
-	// move the object to position
-	moveObjectAbsolute(object_position, object_reset_position, 5000);
+	//    push back the apparatus
+	//Vector3d object_reset_position(0,0,0);
+	//object_reset_position = markers[3].p.transpose();
+	//    calculate where the object has to go
+	//Vector3d object_position(0.0,object_reset_position.y(),-800);
+	//    move the object to position
+	//moveObjectAbsolute(object_position, object_reset_position, 5000);
+
+	reset_phidgets_linear();
+	rotTable = stepper_connect();
 
     glutInit(&argc, argv);
-	if (stereo)
-        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STEREO);
-    else
-        glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
-
-    if (gameMode==false)
-    {   glutInitWindowSize( 640,480 );
-        glutCreateWindow("Evan Experiment");
+	#ifdef SIMULATION
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+		glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+		glutCreateWindow("Simulation test");
+	#else
+		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH | GLUT_STEREO);
+		glutGameModeString(GAME_MODE_STRING);
+		glutEnterGameMode();
 		glutFullScreen();
-    }
-    else
-	{   glutGameModeString("1024x768:32@85");
-        glutEnterGameMode();
-        glutFullScreen();
-    }
+	#endif
 
     initRendering();
-	initGLVariables();
-
+	//initGLVariables();
 	initStreams();
 	initVariables(); // variable "trial" is built
 	//printf( "EVAN EVAN EVAN" );
@@ -1613,11 +1555,12 @@ int main(int argc, char*argv[])
 	boost::thread initVariablesThread(&initVariables);
 
     /* Application main loop */
-	HWND hwnd = FindWindow( "GLUT", "Evan Experiment" );
+	//HWND hwnd = FindWindow( "GLUT", "Evan Experiment" );
 	//SetWindowPos( hwnd, HWND_TOPMOST, NULL, NULL, NULL, NULL, SWP_NOREPOSITION | SWP_NOSIZE );
-	SetForegroundWindow(hwnd);
+	//SetForegroundWindow(hwnd);
     glutMainLoop();
 
+    stepper_close(rotTable);
     cleanup();
     return 0;
 }

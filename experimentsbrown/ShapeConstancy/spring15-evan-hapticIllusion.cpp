@@ -1129,7 +1129,7 @@ void idle()
 			fingersOccluded = 1;
 			//if (!started)
 			//	beepOk(4);
-			if (started && !reachedObject) // only increment if we're in flight
+			if (started && !reachedObject && distanceGripCenterToObject<350) // only increment if we're in flight
 			{
 				num_lost_frames += 1;
 			}

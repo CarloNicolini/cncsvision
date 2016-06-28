@@ -34,8 +34,8 @@ extern const double SCREEN_WIDE_SIZE = 306;    // millimeters
 static const Vector3d calibration(160,179,-75);
 extern const Eigen::Vector3d frameOrigin=calibration;
 // Alignment between optotrak z axis and screen z axis
-double alignmentX =  33.5;
-double alignmentY =  33;
+double alignmentX =  23;//33.5; EVAN CHANGED THIS -- BLAME HIM
+double alignmentY =  37.5;//33; THINGS WERE NOT ALIGNED
 double homeFocalDistance=-270.0, focalDistance= homeFocalDistance, baseFocalDistance= homeFocalDistance;
 
 // Optotrak alignment file , this is a relative path
@@ -47,7 +47,7 @@ static const char GAME_MODE_STRING[]="1024x768:32@85";
 
 // Some Optotrak local variables for the Trieste setup. 
 // See Optotrak,Optotrak2 classes to understand their meaning
-static const int OPTO_NUM_MARKERS  = 22;
+static const int OPTO_NUM_MARKERS  = 24;
 static const float OPTO_FRAMERATE = 85.0f;
 static const float OPTO_MARKER_FREQ = 4600.0f;
 static const float OPTO_DUTY_CYCLE = 0.4f;

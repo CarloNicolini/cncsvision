@@ -71,44 +71,32 @@
 #include "TrialGenerator.h"
 #include "ParametersLoader.h"
 #include "Util.h"
+
+/***** CALIBRATION THINGS *****/
+#include "LatestCalibration.h"
+
 /********* NAMESPACE DIRECTIVES ************************/
 using namespace std;
 using namespace mathcommon;
 using namespace Eigen;
 using namespace util;
 
-#define SIMULATION
-
-#ifdef SIMULATION
-	#include "Optotrak2Sim.h"
-	#include "MarkerSim.h"
-	#include "BrownMotorFunctionsSim.h"
-	using namespace BrownMotorFunctionsSim;
-#else
-	#include <direct.h>
-	#include "Optotrak2.h"
-	#include "Marker.h"
-	#include "BrownMotorFunctions.h"
-	using namespace BrownMotorFunctions;
+#ifndef SIMULATION
+	#include <direct.h> // mkdir
 #endif
 
-/********* #DEFINE DIRECTIVES **************************/
-#define TIMER_MS 11 // 85 hz
-#define SCREEN_WIDTH  1024      // pixels
-#define SCREEN_HEIGHT 768       // pixels
-static const double SCREEN_WIDE_SIZE = 306;    // millimeters
+#include "Optotrak2.h"
+#include "Marker.h"
+#include "BrownMotorFunctions.h"
+//#include "BrownPhidgets.h"
+using namespace BrownMotorFunctions;
+//using namespace BrownPhidgets;
 
-/********* 18 October 2011   CALIBRATION ON CHIN REST *****/
-static const Vector3d calibration(160,179,-75);
-//static const Vector3d objCalibration(199.1, -149.2, -319.6);
-// Alignment between optotrak z axis and screen z axis
-double alignmentX = 33.5;
-double alignmentY = 33;// - 49 - 55.0/2.0;
-double focalDistance= -270.0, homeFocalDistance=-270.0;
 static const Vector3d center(0,0,focalDistance);
-double mirrorAlignment=0.0, screenAlignmentY=0.0, screenAlignmentZ=0.0;
+double mirrorAlignment=0.0, screenAlignmentY=0.0, screenAlignmentZ=0.0, phidgetsAlignment=0.0;
 Screen screen;
 static const Vector3d centercal(29.75,-133.94,-296.16); //updated 9/25/14
+
 /********* VISUALIZATION VARIABLES *****************/
 #ifndef SIMULATION
 	static const bool gameMode=true;
@@ -119,8 +107,9 @@ static const Vector3d centercal(29.75,-133.94,-296.16); //updated 9/25/14
 #endif
 /********* VARIABLES OBJECTS  **********************/
 VRCamera cam;
-Optotrak2 *optotrak;
+Optotrak2 optotrak;
 CoordinatesExtractor headEyeCoords, thumbCoords,indexCoords;
+
 /********** VISUALIZATION AND STIMULI ***************/
 StimulusDrawer stimDrawer[3];
 CylinderPointsStimulus cylinder[3];
@@ -131,10 +120,6 @@ Timer globalTimer;
 Vector3d eyeLeft, eyeRight, ind, thu, platformIndex(0,0,0), platformThumb(0,0,0), noindex(-999,-999,-999), nothumb(-999,-999,-999);
 vector <Marker> markers;
 static double interoculardistance=0.0;
-#ifdef SIMULATION
-vector<Marker> simMarkers;
-Timer simTimer;
-#endif
 
 /********* CALIBRATION VARIABLES *********/
 bool headCalibration=false;
@@ -217,7 +202,8 @@ void phidgets_linear_move(double desired_distance, int * _axis);
 // phidgets stepper
 int CCONV PositionChangeHandler(CPhidgetStepperHandle stepper, void *usrptr, int Index, __int64 Value);
 CPhidgetStepperHandle stepper_connect(void);
-void stepper_rotate(CPhidgetStepperHandle phid, double final_theta);
+void stepper_rotate(CPhidgetStepperHandle phid, double final_theta, double step_constant = 884.511);
+void stepper_set_angle(CPhidgetStepperHandle phid, double desired_theta, double step_constant = 884.511);
 void stepper_close(CPhidgetStepperHandle phid);
 int CCONV SensorChangeHandler(CPhidgetInterfaceKitHandle IFK, void *usrptr, int Index, int Value);
 
@@ -584,9 +570,9 @@ CPhidgetStepperHandle stepper_connect(void)
 
 	//Set up some initial acceleration and velocity values
 	CPhidgetStepper_getAccelerationMax(stepper, 0, &maxAccel_stepper);
-	CPhidgetStepper_setAcceleration(stepper, 0, maxAccel_stepper/100.0);
+	CPhidgetStepper_setAcceleration(stepper, 0, maxAccel_stepper/2.0);
 	CPhidgetStepper_getVelocityMax(stepper, 0, &maxVel_stepper);
-	CPhidgetStepper_setVelocityLimit(stepper, 0, maxVel_stepper/100.0);
+	CPhidgetStepper_setVelocityLimit(stepper, 0, maxVel_stepper/2.0);
 
 	//display current motor position if available
 	if(CPhidgetStepper_getCurrentPosition(stepper, 0, &curr_pos_stepper) == EPHIDGET_OK)
@@ -609,14 +595,14 @@ CPhidgetStepperHandle stepper_connect(void)
 	return stepper;
 }
 
-void stepper_rotate(CPhidgetStepperHandle phid, double final_theta)
+void stepper_rotate(CPhidgetStepperHandle phid, double final_theta, double step_constant)
 {
 	// how many steps?
-	int num_steps = final_theta / 0.1125;
+	int num_steps = (int)final_theta*step_constant;//(int)floor(final_theta * 1.0/.018 * 800.0/90.0);
 	
 	// rotate
 	CPhidgetStepper_setTargetPosition (phid, 0, num_steps);
-
+	
 	// check if still rotating
 	stopped_stepper = PFALSE;
 	while(!stopped_stepper)
@@ -624,6 +610,13 @@ void stepper_rotate(CPhidgetStepperHandle phid, double final_theta)
 		CPhidgetStepper_getStopped(phid, 0, &stopped_stepper);
 		//usleep(100000);
 	}
+
+	CPhidgetStepper_getCurrentPosition(phid, 0, &curr_pos_stepper);
+}
+
+void stepper_set_angle(CPhidgetStepperHandle phid, double desired_theta, double step_constant)
+{
+	CPhidgetStepper_setCurrentPosition(phid, 0, (int)desired_theta*step_constant);
 }
 
 void stepper_close(CPhidgetStepperHandle phid)
@@ -640,21 +633,16 @@ void stepper_close(CPhidgetStepperHandle phid)
 
 void updateTheMarkers()
 {
-#ifdef SIMULATION
-	optotrak->updateMarkers(simMarkers);
-	markers = optotrak->getAllMarkers();
-#else
-	optotrak->updateMarkers();
-	markers = optotrak->getAllMarkers();
-#endif
+	optotrak.updateMarkers();
+	markers = optotrak.getAllMarkers();
 }
 
 void cleanup()
 {
 	// Stop the optotrak
-	optotrak->stopCollection();
-	delete optotrak;
+	optotrak.stopCollection();
 }
+
 
 void calibration_fingers(int phase)
 {
@@ -716,6 +704,11 @@ void drawInfo()
 	text.draw(" ");
 	text.draw("desired theta = " + stringify<double>(step_theta));
 	text.draw(" ");
+	text.draw("Press f to update the position of the stepper");
+	text.draw("Pressing r resets the position of the stepper to zero");
+	text.draw("last known position (in steps) = " + stringify<int>(curr_pos_stepper));
+	text.draw(" ");
+	text.draw("Marker : "+stringify< Eigen::Matrix<double,1,3> > (markers.at(22).p.transpose())+ " [mm]" );
 
 	text.leaveTextInputMode();
 }
@@ -875,6 +868,14 @@ void handleKeypress(unsigned char key, int x, int y)
 		case '5':
 			stepper_rotate(rotTable, step_theta);
 			break;
+		case 'f':
+			{
+				CPhidgetStepper_getCurrentPosition(rotTable, 0, &curr_pos_stepper);
+			} break;
+		case 'r':
+			{
+				stepper_set_angle(rotTable, 0);
+			} break;
 	}
 }
 
@@ -951,23 +952,14 @@ void idle()
 
 void initOptotrak()
 {
-    optotrak=new Optotrak2();
-    optotrak->setTranslation(calibration);
-    int numMarkers=22;
-    float frameRate=85.0f;
-    float markerFreq=4600.0f;
-    float dutyCycle=0.4f;
-    float voltage = 7.0f;
-#ifndef SIMULATION
-    if ( optotrak->init("C:/cncsvisiondata/camerafiles/Aligned20111014",numMarkers, frameRate, markerFreq, dutyCycle,voltage) != 0)
+    optotrak.setTranslation(calibration);
+
+    if ( optotrak.init(LastAlignedFile, OPTO_NUM_MARKERS, OPTO_FRAMERATE, OPTO_MARKER_FREQ, OPTO_DUTY_CYCLE,OPTO_VOLTAGE) != 0)
     {   cerr << "Something during Optotrak initialization failed, press ENTER to continue. A error log has been generated, look \"opto.err\" in this folder" << endl;
         cin.ignore(1E6,'\n');
         exit(0);
     }
-#else
-	optotrak->init("any string applies here - it's just a simulation",numMarkers, frameRate, markerFreq, dutyCycle,voltage);
-	simMarkers.resize(numMarkers+1);
-#endif
+
     // Read 10 frames of coordinates and fill the markers vector
     for (int i=0; i<10; i++)
     {

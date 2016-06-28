@@ -179,7 +179,7 @@ double current_depth = 0.0;
 double stereocheckZ[4] = {25.0, 12.5, -12.5, -25.0};
 double objtheta = 0.0, objdensity = 0.0, theta_sign = 0.0;
 double direction_motion2 = 0.0;
-double rect_width = 7.0, jitterz = 0.0, jitterz_max = 5.0;
+double rect_width = 12.0, jitterz = 0.0, jitterz_max = 5.0;
 
 bool isStimulusDrawn = false;
 bool isTrialDone = false;
@@ -412,14 +412,14 @@ void drawInfo()
 void drawWedge(double size, double deltaz)
 {
 	glColor3fv(glRed);
-	GLfloat thickness = 1.0;
+	//GLfloat thickness = 1.0;
 	double step = 2.0*size / (objdensity - 1.0);
 
 	for(double Y = -size; Y <= size; Y += step)
 	{
 		double Z = - abs(deltaz/size*Y) + deltaz;
 
-		glLineWidth(thickness);
+		//glLineWidth(thickness);
 		glBegin(GL_LINES);
 		glVertex3f(-size - rect_width*0.9, Y, Z);
 		glVertex3f(size + rect_width*0.9, Y, Z);
@@ -544,10 +544,10 @@ void draw_occluders()
 	glTranslated(0, 0, objdistance+5.0);
 //	glRotated(90, 0, 1, 0);
 
+	glTranslated(direction_motion2 * theta_sign * (20.0 + objheight), 0, 0);
+
 	if (current_cue.find('s') != std::string::npos)
 		glRotated(objtheta * direction_motion2 * theta_sign, 0, 0, 1);
-
-	glTranslated(0, direction_motion2 * theta_sign * (6.0 + objheight), 0);
 
 	GLfloat glDarkRed[3] = {0.3,0,0};
 
@@ -557,8 +557,8 @@ void draw_occluders()
 	glBegin(GL_QUADS);
 	glVertex3f(-rect_width/2.0, objheight+5.0, 0);
 	glVertex3f(-rect_width/2.0, -objheight-5.0, 0);
-	glVertex3f(rect_width/2.0 + 5.0, -objheight-5.0, 0);
-	glVertex3f(rect_width/2.0 + 5.0, objheight+5.0, 0);
+	glVertex3f(rect_width/2.0, -objheight-5.0, 0);
+	glVertex3f(rect_width/2.0, objheight+5.0, 0);
 	glEnd();
 
 	// Right occluder
@@ -567,8 +567,8 @@ void draw_occluders()
 	glBegin(GL_QUADS);
 	glVertex3f(-rect_width/2.0, objheight+5.0, 0);
 	glVertex3f(-rect_width/2.0, -objheight-5.0, 0);
-	glVertex3f(rect_width/2.0 + 5.0, -objheight-5.0, 0);
-	glVertex3f(rect_width/2.0 + 5.0, objheight+5.0, 0);
+	glVertex3f(rect_width/2.0, -objheight-5.0, 0);
+	glVertex3f(rect_width/2.0, objheight+5.0, 0);
 	glEnd();
 
 }
@@ -594,15 +594,15 @@ void draw_all(string obj)
 	glTranslated(0, 0, objdistance);
 	glTranslated(0,0,-current_depth-1.0-jitterz);
 //	glRotated(90, 0, 1, 0);
-	glTranslated(0, direction_motion2 * theta_sign * (6.0 + objheight), 0);
+	glTranslated(direction_motion2 * theta_sign * (20.0 + objheight), 0, 0);
 	
 	if (current_cue.find('s') != std::string::npos)
 	{
 		IOD = interoculardistance;
 		glRotated(objtheta * direction_motion2 * theta_sign, 0, 0, 1);
 	}
-	else
-		IOD = 0.0;
+	//else
+	//	IOD = 0.0;
 
 //	if (current_cue.find('s') != std::string::npos && current_cue.find('m') == std::string::npos)
 //		glRotated(-objtheta, 0, 0, 1);
@@ -638,7 +638,7 @@ void drawStimulus()
 		if (timer.getElapsedTimeInMilliSec() > 200)// && timer.getElapsedTimeInMilliSec() < trial_time+200)
 		{
 			draw_all(upper_object);
-			draw_all(lower_object);
+			//draw_all(lower_object);
 		}
 	}
 }
@@ -789,11 +789,11 @@ void initTrial()
 
 		// set the depth of the stimulus to be either clearly smaller or clearly larger than the pedestal
 		if(unifRand(-1.0, 1.0) > 0.0)
-			depth_stimulus = 20.0;
+			depth_stimulus = 80.0;
 		else
-			depth_stimulus = 60.0;
+			depth_stimulus = 80.0;
 
-		objdistance = -450;
+		objdistance = -270;
 	}
 
 	if(experiment)

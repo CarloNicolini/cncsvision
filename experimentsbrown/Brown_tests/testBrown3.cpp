@@ -28,20 +28,20 @@
 #include <stdio.h>
 #include <Eigen/Core>
 
-#include "GLMaterial.h"
+//#include "GLMaterial.h"
 #include "GLLight.h"
 #include "Arcball.h"
 #include "ObjLoader.h"
 #include "StimulusDrawer.h"
 #include "CylinderPointsStimulus.h"
 
-#include "BrownMotorFunctionsSim.h"
-#include "Optotrak2Sim.h"
-#include "MarkerSim.h"
+#include "BrownMotorFunctions.h"
+#include "Optotrak2.h"
+#include "Marker.h"
 
 using namespace std;
 using namespace Eigen;
-using namespace BrownMotorFunctionsSim;
+using namespace BrownMotorFunctions;
 
 Arcball arcball;
 ObjLoader model;
@@ -88,6 +88,11 @@ void initOptotrak()
     }
 }
 
+void avoidunknownnvidiabugwhichshowsupifnobrownmotorfunctionisevercalled()
+{
+    homeEverythingAsynchronous(0,0);
+}
+
 void drawSphereAt(float x, float y, float z, float radius, int quality, bool wired)
 {
     /*
@@ -100,9 +105,9 @@ void drawSphereAt(float x, float y, float z, float radius, int quality, bool wir
                 glutSolidSphere(radius, quality, quality);
             glPopMatrix();
     */
-    frame+=0.1;
+    //frame+=0.1;
 
-
+/*
     GLLight light2;
     light2.setPosition(1,1,0);
     light2.setDiffuse(0.6,0.5,0.5,1.0);
@@ -111,12 +116,13 @@ void drawSphereAt(float x, float y, float z, float radius, int quality, bool wir
     light2.setAmbient(0.6,0.5,0.1,0.1);
     light2.on();
     light2.apply();
-
+*/
     glPushMatrix();
+    glScaled(1.0,1.0,1.0);
     model.draw();
     glPopMatrix();
 
-
+/*
     GLLight light;
     light.setPosition(3,1,0);
     light.setDirection(2,sin(frame),0);
@@ -129,7 +135,7 @@ void drawSphereAt(float x, float y, float z, float radius, int quality, bool wir
     glTranslated(2.0,0,0.5);
     model.draw();
     glPopMatrix();
-
+*/
 }
 
 void handleKeypress(unsigned char key, int x, int y) {
@@ -143,12 +149,14 @@ void handleKeypress(unsigned char key, int x, int y) {
 void initRendering()
 {
     glEnable(GL_DEPTH_TEST);
+    /*
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable (GL_BLEND);
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
     glEnable(GL_NORMALIZE);
     glEnable(GL_COLOR_MATERIAL);
+    */
     glClearColor(0.0,0.0,0.0,1.0);
 
     glMatrixMode(GL_MODELVIEW);
@@ -159,7 +167,8 @@ void initRendering()
 
 void initVariables()
 {
-    model.load("../data/objmodels/coffeemug.obj");
+    model.load("../experimentsbrown/Brown_tests/objmodels/parabolic_cylinder_50.obj");
+    //model.load("../data/objmodels/bunny.obj");
     cylinder.setNpoints(750);  //XXX controllare densita di distribuzione dei punti
     cylinder.setAperture(0,2*M_PI);
     cylinder.setRadiusAndHeight(1,1);
@@ -247,7 +256,7 @@ void drawThings()
     arcball.applyRotationMatrix();
 	glRotated(90,1,0,0);
 	glTranslated(0.0,0.0,-0.5);
-    gluCylinder(quad,1,1,1,20,2);
+    gluCylinder(quad,4,1,1,20,2);
 	glPopMatrix();
 
    
@@ -266,7 +275,7 @@ void drawScene() {
     glTranslatef(0.0f, 0.0f, eyeZ+eyeDistance);
     arcball.applyRotationMatrix();
 
-    //drawSphereAt(0,0,0,2.0,20,1);
+    drawSphereAt(0,0,0,2.0,20,1);
     /*
      GLLight light2;
      light2.setDiffuse(1,sin(frame),0.4,1);
@@ -276,7 +285,7 @@ void drawScene() {
      model.draw();
      glPopMatrix();
     */
-    drawThings();
+    //drawThings();
     //drawReference();
     glutSwapBuffers();
 }
@@ -327,7 +336,7 @@ int main(int argc, char** argv)
 #ifdef SIMULATION
     initOptotrak();
 #endif
-    myReusableQuadric =  gluNewQuadric();
+    //myReusableQuadric =  gluNewQuadric();
     glutDisplayFunc(drawScene);
     glutKeyboardFunc(handleKeypress);
     glutReshapeFunc(handleResize);

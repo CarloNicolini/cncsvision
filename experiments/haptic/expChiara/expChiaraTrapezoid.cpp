@@ -69,7 +69,7 @@ static const bool stereo=true;
 /********* CAMERA AND CALIBRATIONS **********************/
 VRCamera cam;
 Screen screen;
-double homeFocalDistance=-418.5;
+//double homeFocalDistance=-418.5;
 double maxCoveredDistance=0;
 
 Vector3d platformCalibration(350.0,-100.0,-300.0);
@@ -693,7 +693,9 @@ void initializeOptotrakMonitor()
 {
     // Move the monitor in the positions
     RoveretoMotorFunctions::homeMirror(3500);
-    RoveretoMotorFunctions::homeScreen(3500);
+	cerr << "Ciao" << endl;
+   // RoveretoMotorFunctions::homeScreen(3500);
+	cerr << "Ciao2" << endl;
     RoveretoMotorFunctions::homeObjectAsynchronous(3500);
 
     optotrak.setTranslation(calibration);

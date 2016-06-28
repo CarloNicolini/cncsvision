@@ -1,9 +1,10 @@
 #include "BrownPhidgets.h"
 
+// linear actuators
 double start_time = 0.0, movement_time = 0.0, stop_time = 0.0;
 double phidgets_linear_status = 0.0;
 double phi_distance = 0.0;
-double start_acceleration = 100.0, stop_acceleration = 0.0, vel = 20.0;
+double start_acceleration = 80.0, stop_acceleration = 0.0, vel = 20.0;
 const int Z_AXIS = 0, Y_AXIS = 1;
 double step_theta = 45;
 bool first_rotation = true;
@@ -15,6 +16,11 @@ __int64 curr_pos_stepper;
 const char *err_stepper;
 double maxAccel_stepper, maxVel_stepper;
 int stopped_stepper;
+
+// servo
+int result_servo;
+const char *err_servo;
+double maxAccel_servo, maxVel_servo, minAccel_servo;
 
 //-------------------------------
 
@@ -270,7 +276,7 @@ namespace BrownPhidgets
 			double distance = desired_distance*10 - current_position;
 		
 			// if the motor has to travel more than 2 mm (otherwise it's already there so don't move)
-			if(abs(distance) > 20.0)
+			if(abs(distance) > 10.0)
 			{
 				// where is the motor?
 				CPhidgetInterfaceKit_getSensorValue(ifKit, axis, &current_position);
@@ -287,14 +293,16 @@ namespace BrownPhidgets
 					direction = 1;
 			
 				// set initial velocity	
-				double velocity = direction*100.0;
+				double velocity = direction*75.0;
 
 				// motor moves
 				CPhidgetMotorControl_setVelocity (motoControl, axis, velocity);
 
-				bool travelling = false;
+		//		bool travelling = false;
 
 				double part_distance = 0.0, prop_to_travel = 0.0, vel_scaling = 100.0;
+				
+				bool reduced_speed = false;
 
 				// while the motor is traveling
 				while(1)
@@ -302,7 +310,7 @@ namespace BrownPhidgets
 					// update the motor's position
 					CPhidgetInterfaceKit_getSensorValue(ifKit, axis, &current_position);
 
-					travelling = direction*current_position < direction*desired_distance*10;			
+		//			travelling = direction*current_position < direction*desired_distance*10;			
 
 	//				if(travelling)
 	//				{
@@ -313,15 +321,19 @@ namespace BrownPhidgets
 	/*
 						// set a scaling factor for velocity
 						//vel_scaling = pow(prop_to_travel, .5);
-
-						if(prop_to_travel < .30)
-							vel_scaling = .25;
+*/
+						if(prop_to_travel < .30 && !reduced_speed)
+						{
+							vel_scaling = .5;
 						//cerr << vel_scaling << "\t" << travelling << endl;
 		
 						// update velocity (reduce it gradually)
-						CPhidgetMotorControl_setVelocity (motoControl, axis, velocity * vel_scaling);
-					}
-	*/
+							CPhidgetMotorControl_setVelocity (motoControl, axis, velocity * 
+vel_scaling);
+							reduced_speed = true;
+						}
+				//	}
+
 					if(part_distance < 20.0)
 						break;
 				}
@@ -380,10 +392,10 @@ namespace BrownPhidgets
 			}
 
 			//Set up some initial acceleration and velocity values
-			CPhidgetStepper_getAccelerationMin(stepper, 0, &maxAccel_stepper);
-			CPhidgetStepper_setAcceleration(stepper, 0, maxAccel_stepper*4000);
+			CPhidgetStepper_getAccelerationMax(stepper, 0, &maxAccel_stepper);
+			CPhidgetStepper_setAcceleration(stepper, 0, maxAccel_stepper/2.0);
 			CPhidgetStepper_getVelocityMax(stepper, 0, &maxVel_stepper);
-			CPhidgetStepper_setVelocityLimit(stepper, 0, maxVel_stepper);
+			CPhidgetStepper_setVelocityLimit(stepper, 0, maxVel_stepper/2.0);
 
 			// callback
 			//CPhidgetStepper_set_OnCurrentChange_Handler (stepper, PositionChangeHandler, NULL);
@@ -409,6 +421,27 @@ namespace BrownPhidgets
 		#endif
 	}
 
+	void stepper_rotate(CPhidgetStepperHandle phid, double final_theta, double step_constant)
+	{
+		#ifndef SIMULATION
+			// how many steps?
+			int num_steps = (int)final_theta*step_constant;
+			
+			// rotate
+			CPhidgetStepper_setTargetPosition (phid, 0, num_steps);
+
+			// check if still rotating
+			stopped_stepper = PFALSE;
+			while(!stopped_stepper)
+			{
+				CPhidgetStepper_getStopped(phid, 0, &stopped_stepper);
+				//usleep(100000);
+			}
+		#else
+			cerr << "Phidgets stepper is set to " << final_theta << endl;
+		#endif
+	}
+/*
 	void stepper_rotate(CPhidgetStepperHandle phid, double final_theta)
 	{
 		#ifndef SIMULATION
@@ -429,6 +462,11 @@ namespace BrownPhidgets
 			cerr << "Phidgets stepper is set to " << final_theta << endl;
 		#endif
 	}
+*/
+	void stepper_set_angle(CPhidgetStepperHandle phid, double desired_theta, double step_constant)
+	{
+		CPhidgetStepper_setCurrentPosition(phid, 0, (int)desired_theta*step_constant);
+	}
 
 	void stepper_close(CPhidgetStepperHandle phid)
 	{
@@ -441,6 +479,83 @@ namespace BrownPhidgets
 			CPhidget_delete((CPhidgetHandle)phid);
 		#else
 			cerr << "Phidgets stepper is disconnected." << endl;
+		#endif
+	}
+
+	// servo
+	CPhidgetAdvancedServoHandle servo_connect()
+	{
+		#ifndef SIMULATION
+
+			//Declare an advanced servo handle
+			CPhidgetAdvancedServoHandle servo = 0;
+
+			//create the advanced servo object
+			CPhidgetAdvancedServo_create(&servo);
+
+			//Set the handlers to be run when the device is plugged in or opened from software, unplugged or closed from software, or generates an error.
+			CPhidget_set_OnAttach_Handler((CPhidgetHandle)servo, AttachHandler, NULL);
+			CPhidget_set_OnDetach_Handler((CPhidgetHandle)servo, DetachHandler, NULL);
+			CPhidget_set_OnError_Handler((CPhidgetHandle)servo, ErrorHandler, NULL);
+
+			//Registers a callback that will run when the motor position is changed.
+			//Requires the handle for the Phidget, the function that will be called, and an arbitrary pointer that will be supplied to the callback function (may be NULL).
+			//CPhidgetAdvancedServo_set_OnPositionChange_Handler(servo, PositionChangeHandlerServo, NULL);
+
+			//open the device for connections
+			CPhidget_open((CPhidgetHandle)servo, -1);
+
+			//get the program to wait for an advanced servo device to be attached
+			printf("Waiting for Phidget to be attached....");
+			if((result_servo = CPhidget_waitForAttachment((CPhidgetHandle)servo, 10000)))
+			{
+				CPhidget_getErrorDescription(result_servo, &err_servo);
+				printf("Problem waiting for attachment: %s\n", err_servo);
+			}
+
+			return servo;
+		#else
+			cerr << "Phidgets servo is connected." << endl;
+		#endif
+	}
+
+	void servo_rotate(CPhidgetAdvancedServoHandle phid, int motor, double theta, double velocity)
+	{
+		#ifndef SIMULATION
+			//Set up some initial acceleration and velocity values
+			CPhidgetAdvancedServo_getAccelerationMax(phid, motor, &maxAccel_servo);
+			CPhidgetAdvancedServo_setAcceleration(phid, motor, maxAccel_servo/2.0);
+			CPhidgetAdvancedServo_setVelocityLimit(phid, motor, velocity);
+
+			CPhidgetAdvancedServo_setEngaged(phid, motor, 1);
+
+			// conversion from positions to theta
+			double position = 40.0 + theta * 8/9;
+
+			// rotate
+			CPhidgetAdvancedServo_setPosition (phid, motor, position);
+
+		#else
+			cerr << "Phidgets servo is set to " << theta << endl;
+		#endif
+	}
+
+	void servo_disengage(CPhidgetAdvancedServoHandle phid, int motor)
+	{
+		#ifndef SIMULATION
+			CPhidgetAdvancedServo_setEngaged(phid, motor, 0);
+		#else
+			cerr << "Phidget servo is disengaged." << endl;
+		#endif
+	}
+
+	void servo_close(CPhidgetAdvancedServoHandle phid)
+	{
+		#ifndef SIMULATION
+			CPhidget_close((CPhidgetHandle)phid);
+			CPhidget_delete((CPhidgetHandle)phid);
+		#else
+			cerr << "Phidget servo is disconnected." << endl;
 		#endif
 	}
 

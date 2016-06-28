@@ -39,6 +39,9 @@
 #include "GLUtils.h"
 #include "Util.h"
 
+#include "BrownMotorFunctions.h"
+using namespace BrownMotorFunctions;
+
 using namespace std;
 using namespace Eigen;
 
@@ -233,6 +236,11 @@ void mouseDrag(int _x, int _y)
 
     arcball.updateRotation(_x,_y);
     glutPostRedisplay();
+}
+
+void initMotors()
+{
+	homeEverything(4051,3500);
 }
 
 //-------------------------- END OF FUNCTIONS

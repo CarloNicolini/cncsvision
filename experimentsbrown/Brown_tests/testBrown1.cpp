@@ -35,6 +35,9 @@
 #include "StimulusDrawer.h"
 #include "CylinderPointsStimulus.h"
 
+#include "BrownMotorFunctions.h"
+using namespace BrownMotorFunctions;
+
 using namespace std;
 using namespace Eigen;
 
@@ -122,7 +125,7 @@ void initRendering()
 
 void initVariables()
 {
-    model.load("../data/objmodels/coffeemug.obj");
+    model.load("../experimentsbrown/Brown_tests/objmodels/parabolic_cylinder_50.obj");
     cylinder.setNpoints(750);  //XXX controllare densita di distribuzione dei punti
     cylinder.setAperture(0,2*M_PI);
     cylinder.setRadiusAndHeight(1,1);
@@ -229,7 +232,7 @@ void drawScene() {
     glTranslatef(0.0f, 0.0f, eyeZ+eyeDistance);
     arcball.applyRotationMatrix();
 
-    //drawSphereAt(0,0,0,2.0,20,1);
+    drawSphereAt(0,0,0,2.0,20,1);
     /*
      GLLight light2;
      light2.setDiffuse(1,sin(frame),0.4,1);
@@ -276,8 +279,13 @@ void mouseDrag(int _x, int _y)
     glutPostRedisplay();
 }
 
+void avoidunknownnvidiabugwhichshowsupifnobrownmotorfunctionisevercalled()
+{
+    homeEverythingAsynchronous(0,0);
+}
 
-int main(int argc, char** argv)
+
+int main(int argc, char*argv[])
 {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
@@ -286,6 +294,7 @@ int main(int argc, char** argv)
     glutCreateWindow("Carloball");
     initRendering();
     initVariables();
+    
     myReusableQuadric =  gluNewQuadric();
     glutDisplayFunc(drawScene);
     glutKeyboardFunc(handleKeypress);

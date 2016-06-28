@@ -14,8 +14,8 @@ int main (int argc, char** argv)
 	module::Voronoi myModule;
 	myModule.SetSeed(140.0);
 	myModule.SetDisplacement(1.0);
-	myModule.EnableDistance(true);
-	myModule.SetFrequency(0.5);
+	myModule.EnableDistance(false);
+	myModule.SetFrequency(5.0);
 
 	module::Clamp myModuleCl;
 	myModuleCl.SetSourceModule(0,myModule);
@@ -32,7 +32,7 @@ int main (int argc, char** argv)
 	utils::NoiseMapBuilderPlane heightMapBuilder;
 	heightMapBuilder.SetSourceModule (myModuleCl);
 	heightMapBuilder.SetDestNoiseMap (heightMap);
-	heightMapBuilder.SetDestSize (512, 512);
+	heightMapBuilder.SetDestSize (2048, 2048);
 	heightMapBuilder.SetBounds (1.0, 10.0, 1.0, 10.0);
 	heightMapBuilder.Build ();
 
@@ -53,7 +53,7 @@ int main (int argc, char** argv)
 
   utils::WriterBMP writer;
   writer.SetSourceImage (image);
-  writer.SetDestFilename ("voronoi.bmp");
+  writer.SetDestFilename ("/home/carlo/workspace/cncsvisioncmake/experimentsbrown/Brown_tests/examples/voronoi.bmp");
   writer.WriteDestFile ();
 
   return 0;

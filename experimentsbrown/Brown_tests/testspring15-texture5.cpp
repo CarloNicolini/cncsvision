@@ -78,43 +78,30 @@ using namespace Eigen;
 using namespace util;
 using namespace noise;
 
+/////
 #define checkImageWidth 512
 #define checkImageHeight 512
 static GLubyte checkImage[checkImageHeight][checkImageWidth][4];
 static GLuint texName;
+///
+
 double stimulus_height = 150.0;
 double theta = 0.0, textdepth = 0.0, motion = 0.0, motion2 = stimulus_height;
 double direction_motion = 1.0;
 double motion_theta = 0.0;
 
-#define SIMULATION
-
-#ifdef SIMULATION
-	#include "Optotrak2Sim.h"
-	#include "MarkerSim.h"
-	#include "BrownMotorFunctionsSim.h"
-	using namespace BrownMotorFunctionsSim;
-#else
+#ifndef SIMULATION
 	#include <direct.h>
-	#include "Optotrak2.h"
-	#include "Marker.h"
-	#include "BrownMotorFunctions.h"
-	using namespace BrownMotorFunctions;
 #endif
 
-/********* #DEFINE DIRECTIVES **************************/
-#define TIMER_MS 11 // 85 hz
-#define SCREEN_WIDTH  1024      // pixels
-#define SCREEN_HEIGHT 768       // pixels
-static const double SCREEN_WIDE_SIZE = 306;    // millimeters
+#include "Optotrak2.h"
+#include "Marker.h"
+#include "BrownMotorFunctions.h"
+using namespace BrownMotorFunctions;
 
-/********* 18 October 2011   CALIBRATION ON CHIN REST *****/
-static const Vector3d calibration(160,179,-75);
-//static const Vector3d objCalibration(199.1, -149.2, -319.6);
-// Alignment between optotrak z axis and screen z axis
-double alignmentX = 33.5;
-double alignmentY = 33;// - 49 - 55.0/2.0;
-double focalDistance= -270.0, homeFocalDistance=-270.0;
+/***** CALIBRATION THINGS *****/
+#include "LatestCalibration.h"
+
 static const Vector3d center(0,0,focalDistance);
 double mirrorAlignment=0.0, screenAlignmentY=0.0, screenAlignmentZ=0.0;
 Screen screen;
@@ -129,7 +116,7 @@ static const Vector3d centercal(29.75,-133.94,-296.16); //updated 9/25/14
 #endif
 /********* VARIABLES OBJECTS  **********************/
 VRCamera cam;
-Optotrak2 *optotrak;
+Optotrak2 optotrak;
 CoordinatesExtractor headEyeCoords, thumbCoords,indexCoords;
 /********** VISUALIZATION AND STIMULI ***************/
 StimulusDrawer stimDrawer;
@@ -141,10 +128,6 @@ Timer globalTimer;
 Vector3d eyeLeft, eyeRight, ind, thu, platformIndex(0,0,0), platformThumb(0,0,0), noindex(-999,-999,-999), nothumb(-999,-999,-999);
 vector <Marker> markers;
 static double interoculardistance=0.0;
-#ifdef SIMULATION
-vector<Marker> simMarkers;
-Timer simTimer;
-#endif
 
 /********* CALIBRATION VARIABLES *********/
 bool headCalibration=false;
@@ -248,20 +231,14 @@ void beepOk(int tone)
 
 void updateTheMarkers()
 {
-#ifdef SIMULATION
-	optotrak->updateMarkers(simMarkers);
-	markers = optotrak->getAllMarkers();
-#else
-	optotrak->updateMarkers();
-	markers = optotrak->getAllMarkers();
-#endif
+	optotrak.updateMarkers();
+	markers = optotrak.getAllMarkers();
 }
 
 void cleanup()
 {
 	// Stop the optotrak
-	optotrak->stopCollection();
-	delete optotrak;
+	optotrak.stopCollection();
 }
 
 void calibration_fingers(int phase)
@@ -298,57 +275,6 @@ void calibration_head(int phase)
 			headEyeCoords.init( headEyeCoords.getP1(),headEyeCoords.getP2(), markers[10].p, markers[11].p,markers[12].p,interoculardistance );
 		}
 		break;
-	}
-}
-
-void makeCheckImage()
-{
-	module::Voronoi myModule;
-	myModule.SetSeed(unifRand(25.0, 75.0));
-	myModule.SetDisplacement(1);
-	myModule.EnableDistance(false);
-	myModule.SetFrequency(1.0);
-
-//	module::Checkerboard myModule;
-//	module::Turbulence turbo;
-//	turbo.SetSourceModule(0,myModule);
-//	turbo.SetFrequency(.5);
-// 	turbo.SetRoughness(1);
-
-	utils::NoiseMap heightMap;
-	utils::NoiseMapBuilderPlane heightMapBuilder;
-	heightMapBuilder.SetSourceModule (myModule);
-	heightMapBuilder.SetDestNoiseMap (heightMap);
-	heightMapBuilder.SetDestSize (checkImageWidth+2, checkImageHeight+2);
-	heightMapBuilder.SetBounds (1.0, 10.0, 1.0, 10.0);
-	heightMapBuilder.Build ();
-
-	const float* pSource3 = heightMap.GetConstSlabPtr(1,1);
-	cerr << *(pSource3+1) << endl;
-
-	int i, j;
-	float c;
-
-	for (i = 1; i < checkImageHeight; i++) 
-	{
-		const float* pSource3 = heightMap.GetConstSlabPtr(i);
-	
-		for (j = 1; j < checkImageWidth; j++) 
-		{
-			if(*(pSource3+1) != *pSource3 || *(pSource3-1) != *pSource3)
-				c = 255.0;
-			else
-				c = 0.0;
-//			 c = (*pSource3 - 2.0);
-//			 c = c/4.0 * 255.0;
-
-			 checkImage[j][i][0] = (GLubyte) c;
-			 checkImage[j][i][1] = (GLubyte) 0;
-			 checkImage[j][i][2] = (GLubyte) 0;
-			 checkImage[j][i][3] = (GLubyte) 255;
-
-  			 pSource3++;
-		}
 	}
 }
 
@@ -514,6 +440,57 @@ void drawGLScene()
 void drawBlackSquare()
 {
 	
+}
+
+void makeCheckImage()
+{
+	module::Voronoi myModule;
+	myModule.SetSeed(unifRand(25.0, 75.0));
+	myModule.SetDisplacement(1);
+	myModule.EnableDistance(false);
+	myModule.SetFrequency(1.0);
+
+//	module::Checkerboard myModule;
+//	module::Turbulence turbo;
+//	turbo.SetSourceModule(0,myModule);
+//	turbo.SetFrequency(.5);
+// 	turbo.SetRoughness(1);
+
+	utils::NoiseMap heightMap;
+	utils::NoiseMapBuilderPlane heightMapBuilder;
+	heightMapBuilder.SetSourceModule (myModule);
+	heightMapBuilder.SetDestNoiseMap (heightMap);
+	heightMapBuilder.SetDestSize (checkImageWidth+2, checkImageHeight+2);
+	heightMapBuilder.SetBounds (1.0, 10.0, 1.0, 10.0);
+	heightMapBuilder.Build ();
+
+	const float* pSource3 = heightMap.GetConstSlabPtr(1,1);
+	cerr << *(pSource3+1) << endl;
+
+	int i, j;
+	float c;
+
+	for (i = 1; i < checkImageHeight; i++) 
+	{
+		const float* pSource3 = heightMap.GetConstSlabPtr(i);
+	
+		for (j = 1; j < checkImageWidth; j++) 
+		{
+			if(*(pSource3+1) != *pSource3 || *(pSource3-1) != *pSource3)
+				c = 255.0;
+			else
+				c = 0.0;
+//			 c = (*pSource3 - 2.0);
+//			 c = c/4.0 * 255.0;
+
+			 checkImage[j][i][0] = (GLubyte) c;
+			 checkImage[j][i][1] = (GLubyte) 0;
+			 checkImage[j][i][2] = (GLubyte) 0;
+			 checkImage[j][i][3] = (GLubyte) 255;
+
+  			 pSource3++;
+		}
+	}
 }
 
 void drawTexture1()
@@ -814,23 +791,14 @@ void idle()
 
 void initOptotrak()
 {
-    optotrak=new Optotrak2();
-    optotrak->setTranslation(calibration);
-    int numMarkers=22;
-    float frameRate=85.0f;
-    float markerFreq=4600.0f;
-    float dutyCycle=0.4f;
-    float voltage = 7.0f;
-#ifndef SIMULATION
-    if ( optotrak->init("C:/cncsvisiondata/camerafiles/Aligned20111014",numMarkers, frameRate, markerFreq, dutyCycle,voltage) != 0)
+    optotrak.setTranslation(calibration);
+
+    if ( optotrak.init(LastAlignedFile, OPTO_NUM_MARKERS, OPTO_FRAMERATE, OPTO_MARKER_FREQ, OPTO_DUTY_CYCLE,OPTO_VOLTAGE) != 0)
     {   cerr << "Something during Optotrak initialization failed, press ENTER to continue. A error log has been generated, look \"opto.err\" in this folder" << endl;
         cin.ignore(1E6,'\n');
         exit(0);
     }
-#else
-	optotrak->init("any string applies here - it's just a simulation",numMarkers, frameRate, markerFreq, dutyCycle,voltage);
-	simMarkers.resize(numMarkers+1);
-#endif
+
     // Read 10 frames of coordinates and fill the markers vector
     for (int i=0; i<10; i++)
     {

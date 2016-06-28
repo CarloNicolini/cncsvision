@@ -535,10 +535,10 @@ void draw_occluders()
 	glTranslated(0, 0, objdistance+5.0);
 //	glRotated(90, 0, 1, 0);
 
+	glTranslated(0, direction_motion2 * theta_sign * (6.0 + objheight), 0);
+
 	if (current_cue.find('s') != std::string::npos && current_cue.find('m') == std::string::npos)
 		glRotated(theta_stimulus * direction_motion2 * theta_sign, 0, 0, 1);
-
-	glTranslated(0, direction_motion2 * theta_sign * (6.0 + objheight), 0);
 
 	GLfloat glDarkRed[3] = {0.3,0,0};
 
@@ -561,7 +561,7 @@ void draw_occluders()
 	glVertex3f(rect_width/2.0 + 5.0, -objheight-5.0, 0);
 	glVertex3f(rect_width/2.0 + 5.0, objheight+5.0, 0);
 	glEnd();
-
+/*
 	glTranslated( +(50.0/2.0 + rect_width), 0, 0);
 	glColor3fv(glBlack);
 	glBegin(GL_QUADS);
@@ -579,6 +579,7 @@ void draw_occluders()
 	glVertex3f(50.0/2.0, -objheight-5.0, 0);
 	glVertex3f(50.0/2.0, objheight+5.0, 0);
 	glEnd();
+*/
 }
 
 void draw_all(string obj)
@@ -602,7 +603,7 @@ void draw_all(string obj)
 	glTranslated(0, 0, objdistance);
 	glTranslated(0,0,-current_depth-1.0-jitterz);
 //	glRotated(90, 0, 1, 0);
-	glTranslated(0, direction_motion2 * theta_sign * (6.0 + objheight), 0);
+	glTranslated(direction_motion2 * theta_sign * (6.0 + objheight), 0, 0);
 
 	if (current_cue.find('s') != std::string::npos)
 	{

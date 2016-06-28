@@ -1,7 +1,7 @@
 // This file is part of CNCSVision, a computer vision related library
 // This software is developed under the grant of Italian Institute of Technology
 //
-// Copyright (C) 2010-2015 Carlo Nicolini <carlo.nicolini@iit.it>
+// Copyright (C) 2010-2016 Carlo Nicolini <carlo.nicolini@iit.it>
 //
 //
 // CNCSVision is free software; you can redistribute it and/or
