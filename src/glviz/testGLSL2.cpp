@@ -118,7 +118,7 @@ void initRendering()
     glLightfv(GL_LIGHT0, GL_SPECULAR, standardSpecular);
 
     // Object loading
-    //obj.load("data/objmodels/face.obj");
+    obj.load("data/objmodels/face.obj");
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

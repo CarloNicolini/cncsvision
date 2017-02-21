@@ -34,7 +34,7 @@
 #include "Imageloader.h"
 #include "GLSL.h"
 #include "Arcball.h"
-#include "ObjLoader.h"
+#include "ObjLoader2.h"
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
@@ -55,6 +55,8 @@ glsl::glShader *shader;
 GLuint _textureId;
 GLuint cubeMapTexturesId[6];
 
+ObjLoader2 obj;
+
 //Makes the image into a texture, and returns the id of the texture
 GLuint loadTexture(Image* image)
 {
@@ -74,7 +76,9 @@ GLuint loadTexture(Image* image)
 
 void handleKeypress(unsigned char key, int x, int y)
 {  switch (key)
-    {  case 'q': //Escape key
+    {  
+        case 'q': //Escape key
+        case 27: //Escape key
         delete shader;
         exit(0);
         break;
@@ -91,8 +95,8 @@ void handleKeypress(unsigned char key, int x, int y)
 }
 
 void initRendering()
-{  glShadeModel(GL_SMOOTH);
-    
+{   
+    glShadeModel(GL_SMOOTH);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_COLOR_MATERIAL);
     glEnable (GL_BLEND);
@@ -124,17 +128,17 @@ void handleResize(int w, int h)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(FOV, (float)w / (float)h, 0.1, 200.0);
+    gluPerspective(FOV, (float)w / (float)h, 1, 500.0);
 }
 
 void drawThings()
 {
     glPushMatrix();
     glLoadIdentity();
-    glTranslated(0.0,0.0, -10 );
+    glTranslated(0.0,0.0, eyeDistance );
     arcball.applyRotationMatrix();
     shader->begin();
-    glutSolidTeapot(1);
+    obj.draw(GL_LINE);
     shader->end();
     glPopMatrix();
     getGLerrors();
@@ -143,7 +147,7 @@ void drawThings()
 void drawScene()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     frame+=0.1;
@@ -186,13 +190,20 @@ void update(int value)
 int main(int argc, char* argv[])
 {
     string shaderfile(argv[1]);
+    string objfile(argv[2]);
+
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
     glutInitWindowSize(width, height);
 
     glutCreateWindow("GLSL geometry shader");
     initRendering();
-
+    glewInit();
+    
+    obj.load(objfile);
+    obj.center();
+    obj.normalizeToUnitBoundingBox();
+    obj.initializeBuffers();
     // Load (and compile, link) from file
     string shadervert = shaderfile+".vert";
     string shaderfrag = shaderfile+".frag";
