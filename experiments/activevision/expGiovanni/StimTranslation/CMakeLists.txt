@@ -1,7 +1,0 @@
-if(COMPILE_OPTOTRAK)
-add_executable(expGiovanniTranslationPassiveWithStaircaseJitterX expGiovanniTranslationPassiveWithStaircaseJitterX.cpp)
-add_executable(expGiovanniTranslationWithStaircase100Hz-opto-screen expGiovanniTranslationWithStaircase100Hz-opto-screen.cpp)
-
-target_link_libraries(expGiovanniTranslationPassiveWithStaircaseJitterX Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
-target_link_libraries(expGiovanniTranslationWithStaircase100Hz-opto-screen Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
-endif(COMPILE_OPTOTRAK)

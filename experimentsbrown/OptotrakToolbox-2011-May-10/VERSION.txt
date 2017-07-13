@@ -1,3 +1,0 @@
-OptotrakToolbox. Version: 0.90 from:  2011-May-10
-
-(This file was generated automagically)

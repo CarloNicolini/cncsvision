@@ -1,6 +1,0 @@
-add_subdirectory(StimOnFocalPlane)
-add_subdirectory(StimRotationHeadYaw)
-add_subdirectory(StimSolidalToEye)
-add_subdirectory(StimTranslation)
-add_subdirectory(StimTwoPlanesTrans)
-add_subdirectory(PointsStrip)
