@@ -377,7 +377,7 @@ void MainWindow::on_buttonStart_clicked()
             double observer  = guessRate+(1-guessRate-lapseRate)*(0.5*(1.0+erf( (x-mean)/( sqrt(2.0)*std ))));
             bool response = decision < observer;
             // Store the values in these std::vectors
-            /*
+
             simulatedIDS.push_back(s->getID());
             simulatedNInversions.push_back(s->getInversions());
             simulatedStates.push_back(s->getState());
@@ -386,7 +386,7 @@ void MainWindow::on_buttonStart_clicked()
             simulatedNTrial.push_back(trial++);
             //cerr << "Pushing " << s->getID() << " " << s->getInversions() << " with state " << s->getState() << endl;
             id2inversions2states[s->getID()][s->getInversions()]=s->getState();
-            */
+
             finished = parStaircase.step(response);
         }
 
