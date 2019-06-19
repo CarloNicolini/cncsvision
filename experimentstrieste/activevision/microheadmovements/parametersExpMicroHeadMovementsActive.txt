@@ -1,0 +1,45 @@
+BaseDir: C:/cncsvisioncmake/build/Release/
+SubjectName: junk
+IOD: 65
+
+Repetitions: 2
+Randomize: 0
+MaxReinsertions: 0
+
+DrawInfo: 1
+# Calibration circle values in [mm]
+MaxCircleRadius: 10
+MaxZOscillation: 10
+
+# Stimulus parameters
+# StimulusType can be Plane or Sinusoid
+UseCircularOcclusor: 1
+CircularOcclusorRadius:  70
+# Points size in points
+PointsSize: 1
+# Stimulus size (edge) in [mm]
+StimulusSize: 75
+# Stimulus period in [mm]
+StimulusPeriod: 25
+# Stimulus density [points/mm^2]
+StimulusDensity: 0.05
+StimulusType: Sinusoid
+
+# Waiting time in milliseconds
+WaitTime: 250
+# Time for the red probe
+ProbeTime: 250
+# Duration of the stimulus 
+StimulusTime: 1500
+# Projection plane focal distance
+FocalDistance: -418.5
+
+# Experimental factors
+fZWidth: 50
+fSlant: 0
+fTilt:  0 90 180 270
+fStimulusAnchored: 0
+
+###### PASSIVE ONLY PARAMETERS ######
+# PassiveMode can be "standard" or "realtime"
+PassiveMode: standard

@@ -1,0 +1,47 @@
+# Comments start with #
+# List of experimental PARAMETERS: 
+BaseDir: C:/cncsvisiondata/dataset/Robert/expRotatingCylinder/
+SubjectName: junk
+IOD: 70
+# Parameters automatically fed into BalanceFactor to control factorial design
+Repetitions: 1
+Randomize: 0
+RandomizeWithoutRepetitions: 0
+
+DrawInfo: 0
+# Dot density on the surface of the stimuli (in all phases)
+FocalDistance: -420.0
+StimulusDensity: 0.03
+CylinderHeight: 40.0
+CylinderDiameterX: 20.0
+StartCylinderDiameterZ: 40.0
+
+# Wait time in milliseconds
+WaitTime: 500
+StillTime: 1000
+RotationTime: 500
+
+# Lenght of cylinder diameter along Z at the end
+EndCylinderDiameterZ: 60.0
+
+# RefreshMode can be Dynamic or Static
+RefreshMode: Dynamic
+# refresh the dynamic stimulus every N frames
+ModuloRefresh: 1
+
+#### FACTORS LIST #####
+# Start orientation in degrees
+fCylinderOrientation: 135.0
+
+# Staircase parameters measure the final delta angle at the end of rotation in degrees
+sStairNumber: 4
+sStairStartStates: 30.0,15.0,-15.0,-30.0
+sStairAscending: 0,0,1,1
+sStairMaxInversions: 10,20,20,10
+sStairMaxTrials: 70,70,70,70
+sStairCorrectAnswers: 2,1,1,2
+sStairPositiveStep: 5,2
+sStairNegativeStep: 3
+sStairMaxClampHits: 3,3,3,3
+sStairClampLower: -180.0
+sStairClampUpper: 180.0

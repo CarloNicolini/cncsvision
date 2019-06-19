@@ -1,0 +1,41 @@
+# Comments start with #
+# If subjectName is "junk" overwrites
+# Specify BaseDir with the backslash as follows
+BaseDir: dataset\junk\
+SubjectName: junk
+ThetaSign: 1
+# number of repetitions
+Repetitions: 4
+RandomizeWithoutConsecutive: 0
+# randomize levels of factors (1) or not (0)
+Randomize: 1
+SquareSize: 30
+JitterMonUpBound: 7.5
+JitterMonLowBound: -7.5
+RelDepthUpBound: 10
+RelDepthLowBound: -10
+
+StartPosObj: -390
+#########################################
+# Here follows the list of all factors, they all start with "f"
+#########################################
+fAbsDepth: -280 -420
+fRelDepthObj: 40
+
+#### sequence means the object is always staircase-defined, leave it like this
+fsequence: -1 
+
+#### Condition -> -1 = visual || 1 = pointing
+fCondition: 1 
+
+sStairNumber: 4
+sStairStartStates: 10.0,25.0,55.0,70.0
+sStairAscending: 1,1,0,0
+sStairCorrectAnswers: 3,2,2,3
+sStairMaxInversions: 7,7,7,7
+sStairMaxTrials: 30,30,30,30
+sStairPositiveStep: 10,5,3.5,2.5,1.0,0.5
+sStairNegativeStep: 2
+sStairClampLower: 0.0	
+sStairClampUpper: 100.0
+sStairMaxClampHits: 5

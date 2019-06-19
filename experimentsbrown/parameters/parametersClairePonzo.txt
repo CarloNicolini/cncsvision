@@ -1,0 +1,36 @@
+# Comments start with #
+# If subjectName is "junk" overwrites
+# Specify BaseDir with the backslash as follows
+BaseDir: dataset\junk\
+
+# SETTING SUBJECT NAME
+SubjectName: cwc27a
+# SETTING CONDITION: (suggested values)
+# 1 = ponzo left
+# 2 = ponzo right
+# 3 = control 1 (bigger on the right) 
+# 4 = control 2 (bigger on the left)
+# you can set it the way you want (numers only), as long as you are consistent across subjects
+# this parameter is purely a label to distiguish between blocks, it does not affect the program at all
+Condition: 1
+
+
+# REPETITIONS
+Repetitions: 30
+
+# All settings below to remain the same
+ThetaSign: 1
+RandomizeWithoutConsecutive: 0
+# randomize levels of factors (1) or not (0)
+Randomize: 1
+RodVisibleTime: 1500
+StartPosObj: -390
+AbsDepth: -652
+
+#########################################
+# Here follows the list of all factors, they all start with "f"
+#########################################
+
+fObjHeight: 50
+fHapticFB: 2
+fStimPosn: 1 2

@@ -1,0 +1,33 @@
+BaseDir: C:/cncsvisioncmake/build/Release/
+SubjectName: junk
+IOD: 65
+
+Repetitions: 10
+Randomize: 0
+MaxReinsertions: 0
+
+# Stimulus parameters
+# StimulusType can be Plane or Sinusoid
+UseCircularOcclusor: 0
+CircularOcclusorRadius:  70
+PointsSize: 1
+StimulusSize: 75
+StimulusPeriod: 25
+StimulusDensity: 0.05
+StimulusType: Sinusoid
+
+# Waiting time in milliseconds
+WaitTime: 500
+ProbeTime: 500
+StimulusTime: 10000
+FocalDistance: -418.5
+
+DrawInfo: 1
+# values in [mm]
+MaxCircleRadius: 10
+MaxZOscillation: 10
+
+fZWidth: 25
+fSlant: 0 180
+fTilt: 0
+fStimulusAnchored: 0 1
