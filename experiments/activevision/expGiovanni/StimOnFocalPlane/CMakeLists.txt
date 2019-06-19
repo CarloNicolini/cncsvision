@@ -1,0 +1,11 @@
+if(COMPILE_OPTOTRAK)
+add_executable(expGiovanniActiveZfixed expGiovanniActiveZfixed.cpp)
+add_executable(expGiovanniFUNZIONANTEVENERDI expGiovanniFUNZIONANTEVENERDI.cpp)
+add_executable(expGiovanniPassiveZFixed expGiovanniPassiveZFixed.cpp)
+add_executable(expGiovanniPROVA expGiovanniPROVA.cpp)
+
+target_link_libraries(expGiovanniActiveZfixed Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+target_link_libraries(expGiovanniFUNZIONANTEVENERDI Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+target_link_libraries(expGiovanniPassiveZFixed Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+target_link_libraries(expGiovanniPROVA Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+endif(COMPILE_OPTOTRAK)

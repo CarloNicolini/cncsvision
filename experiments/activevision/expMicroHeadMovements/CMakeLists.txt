@@ -1,0 +1,6 @@
+if(COMPILE_OPTOTRAK)
+add_executable(expMicroHeadMovementsActive expMicroHeadMovementsActive.cpp)
+target_link_libraries(expMicroHeadMovementsActive Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+add_executable(expMicroHeadMovementsPassiveStandard expMicroHeadMovementsPassiveStandard.cpp)
+target_link_libraries(expMicroHeadMovementsPassiveStandard Core Experiment GLViz Optotrak ${GL_LIBS} ${Boost_LIBRARIES})
+endif(COMPILE_OPTOTRAK)

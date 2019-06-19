@@ -1,0 +1,3 @@
+add_subdirectory(constantDef)
+add_subdirectory(rotatingProbe)
+add_subdirectory(varyingDef)
