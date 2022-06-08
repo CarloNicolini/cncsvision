@@ -17,3 +17,8 @@ ENV QT_DEBUG_PLUGINS=1
 ENV DISPLAY :0
 RUN cd build; cmake -DQT_SUPPORT=True ..; make -j 8 QtStaircase;
 CMD ["./build/QtStaircase"]
+
+
+# Instructions
+# To run it on Linux do
+# docker run -ti -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH --ipc=host cncsvision/qtstaircase
